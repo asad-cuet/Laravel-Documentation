@@ -1,0 +1,5 @@
+error type:
+error: failed to push some refs to 
+solution:
+git add -A 
+push again
