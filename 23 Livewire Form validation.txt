@@ -1,0 +1,61 @@
+***blade:
+
+
+<form wire.submit.form="submitForm">
+
+Name:<input type="text" wire:model="name" />
+@error('name')
+{{$message}}
+@enderror
+
+
+Email:<input type="text" wire:model="email" />
+@error('email')
+{{$message}}
+@enderror
+
+Phone:<input type="text" wire:model="phone" />
+@error('phone')
+{{$message}}
+@enderror
+
+
+Message:<textarea wire:model="msg"></textarea>
+@error('msg')
+{{$message}}
+@enderror
+
+
+<button type="submit">Submit</button>
+
+</form>
+
+
+
+***class:
+
+public $name;
+public $email;
+public $phone;
+public $msg;
+
+public function updated($fields)       //this for error
+   {
+       $this->validateOnly($fields,[
+           'name'=>'required'         //this error name='name'
+           'email'=>'required|email',
+           'phone'=>'required|digits:10',
+           'msg'=>'required|min:20'
+]);
+   }
+
+public function submitForm()
+
+  {
+       $this->validate([
+           'name'=>'required'
+           'email'=>'required|email',
+           'phone'=>'required|digits:10',
+           'msg'=>'required|min:20'
+        ]);
+        dd($this->name,$this-email,$this->phone,$this->msg);

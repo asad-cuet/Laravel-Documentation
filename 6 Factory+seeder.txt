@@ -1,0 +1,27 @@
+***Create:php artisan make:factory model-name
+ 
+   //create file on database/factories/..
+
+***write on database/factories/Namefactory.php:
+     
+
+    //use App\Models\Model-name;
+
+     protected $model=Model-name::class;
+
+     return [
+
+            'name'=>$this->faker->name,
+            'email'=>$this->faker->email,
+            'phone'=>$this->faker->phoneNumber,
+            'message'=>$this->faker->sentence(5)
+
+      ];
+
+
+***write on database/seeders/DatabaseSeeder.php:
+
+    \App\Models\Model-name::factory(10)->create();
+
+
+***run:php artisan db:seed

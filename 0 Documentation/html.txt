@@ -1,0 +1,32 @@
+1.Responsive Page:
+   <meta name="viewport" content="width=device-width,initial-scale=1.0">
+   <style> * { box-sizing:border-box; }
+
+
+2.Media Query:
+
+   @media screen and (max/min-width:800px) { selector { property:value;} }
+
+3.Syntax:
+   <tag atribute="atribute-value">
+   <img src="" style="" class="" id="">
+
+4.Hyperlink:
+   <a href="url" onclick="return confirm('Are you sure?')">Button</a>
+
+5.Button:
+   <button></button>
+
+6.List:
+   <ul/ol>
+   <li>1</li>
+   <li>2</li>
+   <li>3</li>
+   </ul/ol>
+
+7.Table:
+    <table>
+    <tr><th>..</th></tr>
+    <tr><td>..</td></tr>
+    </table>
+   

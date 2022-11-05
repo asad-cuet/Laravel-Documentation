@@ -1,0 +1,87 @@
+1.Variable:
+    var x=5;
+    var car=[1,2,3,4];
+
+
+
+
+2.Function:
+     function MyFunc(p1,p2)
+     {
+         return p1*p2;
+     }
+     MyFunc(2,3);
+
+
+3.Find Element and Change:
+     *html-content:
+           document.getElementById('#name').innerHTML="Text";
+
+          //< selecting part             >//
+
+     *Attribute-value:
+           document.getElementById('#name').href="url";
+
+
+     *style-property:
+           document.getElementById('#name').style.height="10px";
+
+4.Selecting Way:
+
+    var x=document.getElementById('#name'); x.innerHTML="Text";
+
+    var x=document.getElementByTagName('name');
+
+    var x=document.getElementById('#name');
+    var y=x.getElementByTagName('name');
+
+    var x=document.getElementsByClassName('.name');
+
+    var x=document.querySelectorAll('p .intro');  //returns all p elememnts with intro class
+
+5.Inline Js Function:
+       <button onclick="this.parentElement.[as your wish]";
+
+
+
+6.For Inline js use,you can use w3.js:
+
+     *structure:w3.action(selector)
+
+     *selectors:
+            ('*')                //all
+            (this)              //clicked element
+            ('p')                 //p tag
+            ('p .intro')
+            ('div p:first-child') //1st p tag
+            ('[href]')            //atr    
+            ('a [target=_blank]')            //a with target="_blank"   
+            ('p:nth-child(even)')            //atr   
+
+
+
+     *action:
+            hide()
+            show()
+            toggleShow()
+            addStyle('selector','property-name','value')
+            addClass('selector','class-name)
+            removeClass('selector','class-name)
+
+
+     *Filter:
+           <input oninput="w3.filterHTML('container-id/class','element-id/class',this.value)">
+
+
+     *slideshow:
+            <script>  myShow=w3.slideShow('img/any-ele.>class_name',interval);  //in ms  </script>
+
+            *No autostart:interval=0
+            *add button:
+                   <button onclick="myShow.previous()"..</button>
+                   <button onclick="myShow.next()"..</button>
+
+
+
+
+   

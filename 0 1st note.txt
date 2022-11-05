@@ -1,0 +1,138 @@
+1.Route:
+a.Route::view(‘/url’,’name’);  //blade name
+b.Route::redirect('/url','name');
+c.Route::get(‘/url’,function(){ … });
+d.Route::get(‘/url’,[NAmeController::class,’method’]);
+d.Route::get(‘/url’,[NAmeController::class,’method’])->name(‘url.method’);
+e.Route::get(‘/url/{id}/{name?}’,[NAmeController::class,’method’])->where(‘id’,’[0-9]+’);
+Note:? For optional
+
+
+//edit or Delete Route
+f.Route::put(‘/url/{id}’,[NAmeController::class,’method’]);
+Note:
+<a href=”{{url(‘/url’,$id)}}”>Edit/Delete</a>
+Controller:Method($id) {…}
+
+
+
+
+g.Route::any(‘/url’,[NAmeController::class,’method’]);  //get/post/put
+
+
+
+
+
+2.Controller:
+Create:php artisan make:controller NameController –r
+    public function method()
+    {   
+        $data=array('key'=>'val','key'=>'val');    
+
+        return view('welcome',['students'=>$data]);  //passing data
+
+        return back()->with(‘status’,’text’);
+
+        return redirect(route(‘name’));
+
+      
+
+
+ 
+    }
+//Route::get('/',[studentController::class,'read'])->name('read');
+
+
+3.Fluest String:
+
+
+conreoller method()
+{
+
+
+     format=Str::of('text')->func();
+
+     $slice=Str::of('Welcome to my YT')->after('Welcome to'); //my YT
+
+     $slice=Str::of('app\http\controller\cont')->afterlast('\\'); //cont
+
+     $string=Str::of('Hello')->append('World!'); //Hello World!
+
+                             ->lower();
+
+                             ->upper();
+
+                             ->title();
+
+                             ->replace('tar','val');
+
+                             ->slug('-');  //space replaced by '-'
+
+                             ->trim('/');  //remove
+
+
+
+4.Stub customization:[controller customize]
+
+*run:php artisan stub:publish
+
+*file direct.:stub/controller.plain.stub:  
+  
+*now add your method
+
+
+
+
+5.Http Request:
+
+*controller:
+
+use Illuminate\Http\Request;  //defaultly added
+
+method(Request $request)
+{
+
+   return $request->method();  //  get/post
+
+                  ->path();    // /user
+
+                  ->url();     // parameter will  not be included
+
+                  ->fullUrl(); // Parameter will be included
+
+                  ->session()->func();  //later learn
+
+                  ->input('keyname');
+
+
+
+
+
+6.Http Session:
+
+use Illuminate\Http\Request;  //defaultly added
+
+method(Request $request)
+{
+ 
+//accessing
+
+   return $request->session()->all();  
+
+                             ->get('key');
+
+//creating
+
+                             ->put('key','value');
+
+//deleting
+
+                             ->forget('key');
+
+                             ->flush('key');  // delete all
+
+                             ->pull('key');   // delete after retrieve
+
+
+
+

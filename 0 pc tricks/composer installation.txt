@@ -1,0 +1,2 @@
+1.click on composer.exe
+2.install it in xampp/php/php.ini location 

@@ -1,0 +1,6 @@
+Route::get('/ajax_crud',[AjaxCrudController::class,'ajax_crud'])->name('ajax_crud');
+Route::get('/ajax_crud/read',[AjaxCrudController::class,'read'])->name('ajax_crud.read');
+Route::post('/ajax_crud/create',[AjaxCrudController::class,'create'])->name('ajax_crud.create');
+Route::post('/ajax_crud/edit',[AjaxCrudController::class,'edit'])->name('ajax_crud.edit');
+Route::post('/ajax_crud/update',[AjaxCrudController::class,'update'])->name('ajax_crud.update');
+Route::post('/ajax_crud/delete',[AjaxCrudController::class,'delete'])->name('ajax_crud.delete');

@@ -1,0 +1,11 @@
+1.Zoom: Windows + '+'
+
+  Zoom Out: Windows + '-'
+
+2.Open others window: Windows + '1' or '2' or '3'
+
+3.Minimize all window: windows + 'D'
+
+4.Lock Screen: Windows + 'L'
+
+5.Screenshot: Windows + PrtScr-SysRq 

@@ -1,0 +1,25 @@
+0.Active eamil
+
+1.replace User model:
+
+class User extends Authenticatable implements MustVerifyEmail
+
+
+2.Update web:
+
+Auth::routes(['verify'=>true]);
+
+3.Update HomeController:
+
+    public function __construct()
+    {
+        $this->middleware(['auth','verified']);
+    }
+
+    // edit middleware name on other secure route
+
+extra:access user column:
+
+         if(Auth::user()->address1==NULL)
+         {
+         }

@@ -1,0 +1,25 @@
+*Suppose you take a layout blade file named 'lay.blade.php' inside layout file,
+which contains header and footer
+
+*lay.blade.php:
+
+<title>@yield('title')</title>     // you can put title from another blade
+
+<body>
+//use navbar here
+
+@yield('content')
+
+</body>
+
+
+
+*home.blade.php:
+
+@extends('layout.lay') //it include with lay
+@section('title','home')  //title value puted
+@section('content')
+
+//all code goes here
+
+@endsection

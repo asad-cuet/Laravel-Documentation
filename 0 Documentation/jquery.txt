@@ -1,0 +1,49 @@
+1.How to reload a div tag:
+           $('.cartitems').load(location.href+" .cartitems");    //alert:space before .cartitems  
+
+
+2.For calling a js function again & again:
+
+      $(document).on('click','.delete-cart-item',function(e){
+                  e.preventDefault();
+      });
+
+
+3.call ajax:
+
+  $('#data').keyup(function()   //click
+  {
+    var query= $('#data').val();
+  
+      $.ajax ({
+           url:"autocom.php",
+           method:"POST",
+           data:{query:query},
+           success:function(re_data)
+           {
+             $('#list').fadeIn();
+             $('#list').html(re_data);
+           }
+        });
+
+   }
+
+
+4.Keyup function:
+            <script>   
+                        $('#name').keyup(function()   //click
+                        {
+                        var name=$('#name').val();
+                        name=name.replace(/\s+/g, '-');
+                        $('#slug').val(name);
+                        });
+            </script>
+   
+5.Some Function:
+
+$('select').on('change', function() {
+  alert( this.value );
+});
+
+
+  

@@ -1,0 +1,12 @@
+1.Downloaded in D/soft/
+
+2.double click
+
+3.ticks all, next yes
+
+4.after open additional took: press Enter
+
+5.Power SHell: yes, enter
+
+*How to update: Delete old file,install new
+

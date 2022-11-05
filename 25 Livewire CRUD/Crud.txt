@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Http\Livewire;
+use App\Models\laravel_crud;
+
+use Livewire\Component;
+use Livewire\WithPagination;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;  //this is file delete
+ 
+
+
+class Crud extends Component
+{
+   use WithPagination;
+   use WithFileUploads;
+   public $ids;
+   public $name;
+   public $email;
+   public $phone;
+   public $message;
+   public $filename;
+   public $old_filename;
+
+   
+   public function resetData()
+   {
+         $this->name='';
+         $this->email='';
+         $this->phone='';
+         $this->message='';
+         $this->filename='';
+   }
+
+   public function create()
+   {
+         $validateData=$this->validate([
+             'name'=>'required',
+             'email'=>'required|email',
+             'phone'=>'required',
+             'message'=>'required',
+             'filename'=>'required'
+         ]);
+
+         $filename=$this->filename->store('files','public');
+         $validateData['filename']=$filename;
+         laravel_crud::create($validateData); //created
+         session()->flash('message','Data Created');
+         $this->resetData();
+         $this->emit('dataCreated');
+   }
+
+   public function edit($id)
+   {
+        $data=laravel_crud::where('id',$id)->first();
+        $this->ids=$data->id;
+        $this->name=$data->name;
+        $this->email=$data->email;
+        $this->phone=$data->phone;
+        $this->message=$data->message;
+        $this->filename=$data->filename;
+        $this->old_filename=$data->filename;
+   }
+    
+   public function update($id)
+   {
+    $validateData=$this->validate([
+        'name'=>'required',
+        'email'=>'required|email',
+        'phone'=>'required',
+        'message'=>'required',
+        'filename'=>'required'
+    ]);
+    
+    //  dd(url('storage/'.$this->old_filename));
+    if($this->ids)
+    {
+        $data=laravel_crud::find($this->ids);
+        $filename=$this->filename->store('files','public');  //uploaded new
+       // Storage::delete(url('storage/'.$this->old_filename));       //deleted old
+        $validateData['filename']=$filename;
+        $data->update($validateData);
+        
+    }
+    session()->flash('message','Data Updated');
+    $this->resetData();
+    $this->emit('dataUpdated');
+
+    $this->dispatchBrowserEvent('close-modal');
+   }
+
+
+
+   public function delete($id)
+   {
+       laravel_crud::where('id',$id)->delete();
+       session()->flash('message','Data Deleted');
+       
+   }
+     
+    public function render()
+    {
+        $datas_=laravel_crud::orderBy('id','DESC')->paginate(5);
+        return view('livewire.crud',['datas'=>$datas_]);
+    }
+}
+
+
+
+?>

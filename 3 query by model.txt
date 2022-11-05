@@ -1,0 +1,71 @@
+*Create:
+code:php artisan make:model Model-name  //add -m for migration
+
+*In app/hhtp/models/Model-name.php:
+write inside class:protected $table='posts';  // if you created a table named "posts",no problem this table will be model
+                   protected $fillable=["col","col"];
+
+
+*Include:
+use App\Models\Model-name;
+
+*Some Important controllers by model:
+
+                Reading and redirect:
+                                    public function index()
+                                    {
+                                           $students=Model-name::all();    // or get()
+                                                //Model-name::orderBy('Id','desc')->get(); 
+                                          return view('home',['students'=>$students]);
+                                    }
+
+
+                 pagination Reading and redirect:
+                                    public function index()
+                                    {
+                                           $students=Model-name::paginate(10);
+                                          return view('home',['students'=>$students]);
+                                    }
+
+                 //for Button in blade just write code anywhere: {{$students->links()}}
+                 <style>
+               nav svg {
+                        height:20px;
+                       }
+                 </style>
+
+
+
+                Inserting and redirect with session:                    
+                                                    public function create(Request $request)
+                                                   {
+                                                         $student = new Model-name;
+                                                         $student->Name=$request->name;
+                                                         $student->City=$request->city;
+                                                         $student->Marks=$request->marks;
+                                                         $student->save();
+                                                         return redirect(route('index'))->with('status','Data Created!!');
+                                                   }
+                Reading a row for edit:                    
+                                        public function edit($id)
+                                       {
+                                            $student=Model-name::find($id);
+                                            return view('editform',['stu'=>$student]);
+                                       }
+
+                 Updating that row and redirect:
+                                      public function update(Request $request, $id)
+                                           {
+                                               $student=Model-name::find($id);
+                                               $student->Name=$request->name;
+                                               $student->City=$request->city;
+                                               $student->Marks=$request->marks;
+                                               $student->save();
+                                               return redirect(route('index'))->with('status','Data Updated!!');
+                                           }       
+                   Deleting a row and redirecing:
+                                                public function destroy($id)
+                                                   {
+                                                      $student=Model-name::destroy($id);
+                                                      return redirect(route('index'))->with('status','Data Deleted!!');
+                                        

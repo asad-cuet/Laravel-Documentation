@@ -1,0 +1,35 @@
+edit /config/app.php
+'timezone' => 'Asia/Dhaka'
+or,
+'timezone' => 'Asia/Kolkata'
+
+Date of this week:
+==================
+<?php
+date_default_timezone_set("Asia/Dhaka");
+
+
+echo date("Y-m-d h:i:sa") . "<br>";
+
+$startdate=strtotime("Saturday");
+echo date("M d", $startdate);
+
+
+?>
+
+In function:
+===========
+date_default_timezone_set("Asia/Dhaka");
+
+function dateOfDay($day) {
+  $startdate=strtotime($day);
+  return date("M d", $startdate);
+}
+
+
+
+echo date("Y-m-d h:i:sa") . "<br>";  //checking that time in bd
+
+echo dateOfDay("Saturday");
+
+

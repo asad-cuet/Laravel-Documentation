@@ -1,0 +1,5 @@
+*Create folder:errors & file:
+               404.blade.php //at resouces/views/..
+               503.blade.php //for site under maintainance and run:php artisan down.to active:php artisan up
+
+*design the 404.blade.php file.Done!!

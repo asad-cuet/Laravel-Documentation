@@ -1,0 +1,65 @@
+run:
+npm install
+npm install vue@next vue-loader@next
+
+modify:webpack.mix.js:  mix.js('resources/js/app.js', 'public/js').vue()
+
+
+npm run watch  [run serve]
+and
+php artisan serve  [in other git bash]
+
+
+Done!!
+
+
+app.js:
+
+require('./bootstrap');
+
+import {createApp} from 'vue';
+
+import App from './vue/App';
+
+createApp(App).mount('#app')
+
+
+App.vue:
+
+<template>
+  <div>
+      <h2>Welcome</h2>
+  </div>
+</template>
+
+<script>
+export default {
+
+}
+</script>
+
+<style>
+
+</style>
+
+
+welcome.blade.php
+
+        <link href="{{asset('css/app.css')}}" rel="stylesheet">
+
+
+        <style>
+            body {
+                font-family: 'Nunito', sans-serif;
+            }
+        </style>
+    </head>
+    <body class="antialiased">
+      <div id="app">
+        <app></app>
+      </div>
+
+
+      <script src="{{asset('js/app.js')}}"></script>
+      
+    </body>

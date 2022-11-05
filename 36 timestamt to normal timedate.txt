@@ -1,0 +1,11 @@
+date('m/d/Y H:i:s a',strtotime($item['updated_at']))
+
+// a is am/pm maker
+
+present time:
+$time = time();               // you have 1299446702 in time
+$year = $time/31556926 % 12;  // to get year
+$week = $time / 604800 % 52;  // to get weeks
+$hour = $time / 3600 % 24;    // to get hours
+$minute = $time / 60 % 60;    // to get minutes
+$second = $time % 60;         // to get seconds

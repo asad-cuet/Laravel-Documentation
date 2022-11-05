@@ -1,0 +1,17 @@
+PHP:
+1.Download php installation file
+
+2.Paste file C:/Programe file
+
+3.go > Edit system variaable > Environment Variable > System Variable :: path > new path > paste php path
+
+4.Done
+
+Xampp:
+1.Download xampp installation file
+
+2.install
+
+3.go > Edit system variaable > Environment Variable > System Variable :: path > new path > paste apache path
+
+4.Done

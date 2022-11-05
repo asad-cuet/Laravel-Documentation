@@ -1,0 +1,74 @@
+*Introduction:
+Laravel includes the ability to seed your database with data using seed classes. 
+All seed classes are stored in the database/seeders directory. By default,
+a DatabaseSeeder class is defined for you. From this class, 
+you may use the call method to run other seed classes, 
+allowing you to control the seeding order.
+
+
+*Create:php artisan make:seeder NameSeeder
+
+
+*File Directory:database/seeders/DatabaseSeeder.php
+
+*NameSeeder.php:
+//A seeder class only contains one method by default: run. 
+//This method is called when the db:seed Artisan command is executed.
+
+//include
+
+use Illuminate\Support\Facades\DB;  //for query
+use Illuminate\Support\Facades\Hash; //for make random password
+use Illuminate\Support\Str;           //for make randong string
+use Faker\Factory as Faker;    //to create random tetxt
+
+
+public function run()
+    {
+        DB::table('users')->insert([
+            'name' => Str::random(10),                // 'Asadul Islam',
+            'email' => Str::random(10).'@gmail.com',  
+            'password' => Hash::make('password'),
+        ]);
+    }
+
+
+//by faker
+
+//artisan code:composer dump-autoload
+
+public function run()
+    {
+        $faker=Faker::create();
+         foreach(range(1,100) as $index)
+         {
+         DB::table('users')->insert([
+            'title' => $faker->sentence(5),                // 'Asadul Islam',
+            'email' => $faker->paaragraph(4),  
+          ]);
+         }
+    }
+
+
+*DatabaseSeeder.php:   //link the seeder
+
+
+public function run()
+{
+    $this->call([
+        NameSeeder::class,
+
+    ]);
+}
+
+
+
+*Run seeder: 
+
+php artisan db:seed
+
+or,
+
+php artisan db:seed --class=NameSeeder    //to specify
+
+php artisan migrate:fresh --seed   //Delete all rows

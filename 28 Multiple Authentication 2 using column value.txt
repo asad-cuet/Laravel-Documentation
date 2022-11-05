@@ -1,0 +1,90 @@
+1.create new project
+
+2.connect database
+
+3.create ui system  //don't migrate now
+
+4.modify user migration:
+
+      add:$table->tinyInteger('role_as')->default('0');
+
+      add the column manually in database
+
+5.migrate now
+
+
+6.admin middleware:
+
+      php artisan make:middleware AdminMiddleware
+
+
+7.replace in middleware:
+
+      use Illuminate\Support\Facades\Auth;
+      public function handle($request, Closure $next)
+    {
+        if(Auth::check())
+        {
+            if(Auth::user()->role_as == '1')
+            {
+                return $next($request);
+            }
+            else
+            {
+                return redirect('/home')->with('status','Access Denied! as you are not as admin');
+            }
+        }
+        else
+        {
+            return redirect('/home')->with('status','Please Login First');
+        }
+    }
+
+
+   
+
+
+8.Kernel.php:
+
+
+    protected $routeMiddleware = [
+
+        'isAdmin' => \App\Http\Middleware\AdminMiddleware::class, //Add to the end
+    ];
+
+
+9.Controllers/Auth/LoginController.php:
+
+       comment $redirectTo
+
+       paste:   
+     use Illuminate\Support\Facades\Auth; 
+    protected function authenticated()
+    {
+        if(Auth::user()->role_as == '1') //1 = Admin Login
+        {
+            return redirect('dashboard')->with('status','Welcome to your dashboard');
+        }
+        elseif(Auth::user()->role_as == '0') // Normal or Default User Login
+        {
+            return redirect('/')->with('status','Logged in successfully');
+        }
+    }
+
+
+   //  import Auth class  [click>right-button,import class]
+
+
+10.web.php:
+
+      Route::middleware(['auth','isAdmin'])->group(function () {
+
+            Route::get('/dashboard', function () {
+                 return view('admin.dashboard');   //temporally use:return "Admin Login";
+                                  });
+
+          });
+
+11.edit role_as value in user table.create a new user as normal user
+
+Note:Now admin login redirect to different route from user

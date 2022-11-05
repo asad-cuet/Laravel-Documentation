@@ -1,0 +1,128 @@
+***Installation****
+
+1.Create fresh laravel project
+
+2.composer require tcg/voyager
+
+3.Connect database
+
+4.app/providers/AppServiceProvider.php:
+
+
+   //add
+
+use Illuminate\Support\Facades\Schema;
+
+public function boot()
+{
+    Schema::defaultStringLength(191);
+}
+
+
+5. php artisan voyager:install
+
+   or,
+  
+   php artisan voyager:install --with-dummy
+
+
+*Note*:Done
+
+Url:http://localhost:8000/admin
+email: admin@admin.com
+password: password  
+
+
+***Update Profile***
+
+1..env:
+
+edit:APP_URL=http://127.0.0.1:8000
+
+2.restart server
+
+3.now go to profile and update
+
+4.File: config/:voyeger.php,filesystems.php etc
+
+5.Modify logo,title,background:
+
+   go to:setting>admin>update
+
+   you can add new column on setting by add-new-setting
+
+
+6.voyeger.php:
+      Navbar Dropdown modify:inside 'dashboard',
+
+      color modify:inside 'primary_color',
+ 
+      tips showing mod: 'show_dev_tips',
+
+7.Modify route:  [URL/admin/slug-name]
+
+    go to:tools>database>edit-breads> update url slug
+
+    go to:menu buider>admin-builder>edit>update Route for menu items
+
+    /you can add menu item from menu builder
+
+8.Frontend Menu make:
+
+    go to:menu-builder>add-new:make>builder>new-menu-item>   
+                          link type:static 
+                          url:/    // it means=http://localhost:8000/  , href value
+   
+    for sub-menu:just drag little into right
+
+    
+    go to:blade.php>write to show:{!! menu('name') !!}    //name is menu name
+
+
+9.New Post:
+
+    go to:post>add new>create
+
+    effect:media>posts> a new folder and 4 files of a image
+
+10.show/update structure of table:
+
+    go to:tools>database>view/update
+
+11.Create table:
+
+    go to:tools>database>create-new-table>create [name:Products]
+
+
+11.Crud in table:
+
+    go to:tools>database>add-to-bread>
+                     update model-name
+
+    create a model named [Product] // create from tools>compass>command
+
+    done.
+   
+    go to:tools>database>browse
+
+12.Set icon in menu item:
+
+    go to:tools>edit-bread>voyeger-font-class>copy paste    //added for browse
+
+    go to:menu-builder>edit>set font icon class
+
+13.Create relationship: [between Produsts,category]
+
+    go to:tools>database>edit>new column = category_id
+
+    go to:tools>database>edit-bread>relationship>
+                                  'belons-to','category','App\Models\Category'
+                                   'user_id'  //reference column -Products
+                                   'name'    // fetch column     -category
+                                   'id'     //                   -category
+    done
+
+    
+
+
+

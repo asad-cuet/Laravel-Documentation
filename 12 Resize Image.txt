@@ -1,0 +1,35 @@
+***Install package:composer require intervention/image
+
+
+***Set the package:config/app.php:
+
+   inside provider array:
+
+         \Intervention\Image\ImageServiceProvider::class,
+
+
+   inside aliases array:
+
+         'Image'=>\Intervention\Image\Facades\Image::class,
+
+
+***artisan:php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"
+
+
+
+***controller.php:
+
+use Image;
+
+resizeImage(Request $request)
+
+   {
+
+      $image=$request->file;
+      $filename=$image->getClientOriginalName();
+      $image_resize=Image::make($image->getRealPath());
+      $image_resize->resize(300,300);
+      $image_resize->save(public_path('image/'.$filename));  //image will be upload at public/image/...
+      return "Image resized";
+
+     }

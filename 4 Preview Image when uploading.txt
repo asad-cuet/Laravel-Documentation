@@ -1,0 +1,27 @@
+
+***Preview Image when uploading:
+
+<form>
+@csrf
+...
+...
+<input type="file" name="file" onchange="previewFile(this)" />
+<img id="previewImg" alt="" />
+..
+</form>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    function previwFile(input) 
+    {
+       var file=$("input[type=file]").get(0).files[0];
+       if(file)
+        {
+               var reader=new FileRecord();
+               reader.onload=function() {
+                        $('#previwImg').attr("src",reader.result);
+                }
+               reader.readAsDataURL(file);
+        }
+    }
+</script>

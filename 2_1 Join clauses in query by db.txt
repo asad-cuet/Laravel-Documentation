@@ -1,0 +1,40 @@
+1.Set relation in database:
+       
+        *Go to table
+        *go to structure and click on relation
+        *set the column relation with another table column
+
+2.Query on method:[controller]
+
+   *innerjoin :he INNER JOIN keyword selects records that have matching values in both tables.
+
+     $read=DB::table('t1-name')
+        ->join('t2-name','t1-name.col-name','=','t2-name.col-name')
+        ->select('t1-name.col','same','same') //you can skip this
+        ->get();
+     return ....;
+
+
+   *leftjoin  //retrieve both table data   
+   :The LEFT JOIN keyword returns all records from the left table (table1), 
+    and the matching records (if any) from the right table (table2).
+
+     $read=DB::table('t1-name')
+        ->leftJoin('t2-name','t1-name.col-name','=','t2-name.col-name')
+        ->get();
+     return ....;
+
+
+
+
+    *rightJoin:
+    The RIGHT JOIN keyword returns all records from the right table (table2), 
+    and the matching records (if any) from the left table (table1). 
+
+
+    *crossJoin:
+     The CROSS JOIN keyword returns all records from both tables (table1 and table2).
+
+
+    *selfJoin:
+     A self join is a regular join, but the table is joined with itself.

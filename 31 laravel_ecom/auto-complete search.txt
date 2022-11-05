@@ -1,0 +1,92 @@
+1.html:
+        <!-- Search box -->
+         <div class="search-bar">
+          <form action="{{url('/search-product')}}" method="POST">
+            @csrf
+          <div class="input-group">
+            <input type="search" class="form-control" name="product_name" id="auto_complete" placeholder="Seach Product" aria-label="Username" aria-describedby="basic-addon1">          
+            <button type="submit" class="input-group-text"><i class="fa fa-search"></i></button>
+          </div>
+          </form>
+         </div>
+
+2.css:
+  .search-bar {
+    width:40%;
+    margin-left: 5%;
+  }
+  /*autocomplete var */
+
+  ui-menu{
+    z-index: 3500!important;
+  }
+
+
+3.link:
+      <!-- Jquery autocomplete -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+
+
+4.script:
+
+  <!--Autocomplete script-->
+  <script>
+    
+      var availableTags = [];
+      $.ajax({
+        method:"GET",
+        url:"/product-list",
+        success:function(response)
+        {
+          //console.log(response);
+          start_auto_complete(response);
+        }
+      });
+
+      function start_auto_complete(availableTags)
+      {
+          $( "#auto_complete" ).autocomplete({
+          source: availableTags
+          });
+      }
+
+    
+    </script>
+
+
+5.web:Route::post('/search-product','Frontend\FrontendController@search_products');
+
+6.Controller:
+
+    public function search_products(Request $request)
+    {
+        $product_name=$request->input('product_name');
+
+        if($product_name!='')
+        {
+            $product=Product::where('name','LIKE','%'.$product_name.'%')
+                             ->orWhere('meta_title','LIKE','%'.$product_name.'%')
+                             ->orWhere('meta_keywords','LIKE','%'.$product_name.'%')
+                             ->orWhere('meta_descript','LIKE','%'.$product_name.'%')
+                             ->orWhere('small_description','LIKE','%'.$product_name.'%')
+                             ->orWhere('description','LIKE','%'.$product_name.'%')
+                             ->get();
+            if($product)
+            {
+                return view('frontend.search',['product'=>$product]);
+            }
+            else
+            {
+                return redirect()->back()->with('status',"No product matched your search");
+            }
+
+        }
+
+        else
+        {
+            return redirect()->back();
+        }
+
+
+    }

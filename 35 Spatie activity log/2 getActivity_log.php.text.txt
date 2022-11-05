@@ -1,0 +1,49 @@
+<?php
+use Spatie\Activitylog\Models\Activity;
+use App\Models\User;
+use App\Models\Admin;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+
+function getActivity()
+{
+      $activity=Activity::orderBy('id','desc')->get();
+        //return some column in a objects's array
+        $activity=collect($activity)->map(function($item,$key)
+        {
+            //getting causer Model
+            $causer_model=explode('Models',$item['causer_type']);
+            $causer_model=stripslashes($causer_model[1]);
+            $causer_table=$causer_model.'s';
+
+            
+            //getting causer details
+            $causer_details=DB::table($causer_table)->where('id',$item['causer_id'])->first();
+            $causer_name=$causer_details->name;
+
+
+
+            //getting subject Model
+            $subject_model=explode('Models',$item['subject_type']);
+            $subject_model=stripslashes($subject_model[1]);
+
+
+            //making details
+            $details=$subject_model.'-'.$item['subject_id'].' is '.$item['event'].' by '.$causer_model.'-'.$item['causer_id'].' '.$causer_name;
+
+             return [
+                  'details'=>$details,
+                  'class'=>$item['class'],
+                  'updated_at'=>date('h:i',strtotime($item['updated_at'])),
+                  'link'=>$item['link'],
+                  'link_title'=>$item['link_title'],
+
+            ];
+        });
+
+
+      return $activity;
+}
+
+
+?>

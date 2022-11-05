@@ -1,0 +1,23 @@
+web.php:
+
+//admin route
+
+Route::namespace('Admin')->prefix('admin')->name('admin.')  //prefix for add at begin url,name() for add name
+
+                         ->group(function(){
+
+                      Route::namespace('Auth')->group(function(){
+          
+                            //login route                   
+                            Route::get('login','AuthenticatedSessionController@create')->name('login');  //url('admin/login'),create is method
+                            Route::post('login','AuthenticatedSessionController@store')->name('adminlogin ');
+
+                                                                  })         
+
+                                            });
+
+
+
+Route::prefix('category')->name('category.')->group(function(){
+         Route::get('read','Admin\CategoryController@read')->name('read'); 
+                                      });

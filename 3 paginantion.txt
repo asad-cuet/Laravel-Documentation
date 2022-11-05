@@ -1,0 +1,20 @@
+                 pagination Reading and redirect:
+                                    public function index()
+                                    {
+                                           $students=Model-name::paginate(10);
+                                          return view('home',['students'=>$students]);
+                                    }
+
+                 //for Button in blade just write code anywhere: {{$students->links()}}
+                 <style>
+               nav svg {
+                        height:20px;
+                       }
+                 </style>
+
+Customizing:
+
+run: php artisan vendor:publish --tag=laravel-pagination
+
+customize links:
+{{ $paginator->links('path.file-name') }}

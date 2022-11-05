@@ -1,0 +1,7 @@
+Jetstream take 'Name','Email','Password','Confirm Password' for login
+
+1.composer require laravel/jetstream
+2.php artisan jetstream:install livewire
+3.php artisan migrate  //before it,you can edit user migration file for better profile.
+4.php artisan migrate
+5.npm install & npm dev

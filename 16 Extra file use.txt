@@ -1,0 +1,14 @@
+*Create a folder named 'helper' in app.And create a file function.php.
+
+*composer.json:
+
+//add in autoload{..}
+
+   "files":["app/helper/function.php"]
+     
+
+*run:composer dumb-autoload
+
+
+*now you can use your function in controller method
+

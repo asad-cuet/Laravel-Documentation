@@ -1,0 +1,3 @@
+kill port cmd command:npx kill-port 3306
+
+kill app:tasklist>Taskkill /PID 4132 /F

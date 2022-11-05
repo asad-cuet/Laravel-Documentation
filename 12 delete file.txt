@@ -1,0 +1,32 @@
+***Using File system:
+
+use File;
+
+public function removeImage()
+{
+    if(\File::exists(public_path('upload/bio.png')))
+    {
+        \File::delete(public_path('upload/bio.png'));
+    }
+    else
+    {
+     dd('File does not exists.');
+    }
+}
+
+
+
+***Using core PHP:
+
+
+public function removeImage()
+{
+     if(file_exists(public_path('upload/bio.png')))
+     {
+         unlink(public_path('upload/bio.png'));
+     }
+     else
+     {
+     dd('File does not exists.');
+     }
+}

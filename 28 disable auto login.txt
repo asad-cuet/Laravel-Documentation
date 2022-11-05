@@ -1,0 +1,25 @@
+Auth/RegisterController.php:
+============================
+
+//import:
+
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
+
+
+
+// Paste below code under this line: use RegistersUsers;
+
+
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+        event(new Registered($user = $this->create($request->all())));
+        // $this->guard()->login($user);
+        return $this->registered($request, $user)
+                            ?: redirect($this->redirectPath());
+    }
+
+
+
+// Now register method is overrited which explained in RegisterUsers

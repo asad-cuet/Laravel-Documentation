@@ -1,0 +1,25 @@
+Whats-app:::
+
+1.layout with link & number:
+
+<div class="whats-chat">
+  <a href="https://wa.me/+8801781856861?text=I'm%20interested%20in%20your%20car%20for%20sale" target="_blank">
+    <img src="{{asset('assets/image/whats-app.jpg')}}" alt="Whats app logo" height="100px" width="100px">
+  </a>
+</div>
+
+  .whats-app {
+    position:fixed;
+    bottom:5px;
+    left:5px;
+  }
+
+
+Tawk to:::
+
+
+1.web:https://www.tawk.to/
+
+configire:dashboard>setting>chat-widget>enter-widget-name>copy the code>done>
+            
+          paste the code in your layout page

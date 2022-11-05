@@ -1,0 +1,32 @@
+*File directory:resource/lang/...
+
+*english lang. file in en folder.
+others lang. file will be in other folder.other folder you
+have to create
+
+***How to do:
+
+   *resource/lang/en/message.php:
+
+       return [ "text"=>"English text","lang"=>"English"];
+
+
+   *resource/lang/other/message.php:
+
+       return [ "text"=>"Other lang. text","lang"=>"Other"];
+
+***On blade:
+
+      <p>{{ __('message.text')}}</p>
+      <p>{{ __('message.lang')}}</p>
+
+***Route::get('/url/{locale}',function($local)
+
+        {
+            App::setlocale($locale);
+            return view('welcome');
+        });
+
+***test:localhost:8000/en  or /other
+
+

@@ -1,0 +1,88 @@
+
+use Illuminate\Support\Facades\DB;
+
+
+    public function read()
+    {
+        $students=DB::table('students')->get();
+        return view('welcome',['students'=>$students]);
+    }
+
+//Route::get('/',[studentController::class,'read'])->name('read');
+
+//blade:
+                 @foreach($students as $stu)
+                <tr>
+                    <td>{{$stu->id}}</td>       or,   {{$stu['col']}} 
+                    <td>{{$stu->Name}}</td>   
+                    <td>{{$stu->City}}</td>   
+                    <td>{{$stu->Marks}}</td>   
+                </tr>   
+                @endforeach 
+
+
+
+
+    public function create(Request $request)
+    {
+        DB::table('students')->insert([
+             'Name'=>$request->name,
+             'City'=>$request->city,
+             'Marks'=>$request->marks,
+        ]);
+        return redirect(route('index'))->with('status','Student added!!');
+    }
+
+//Route::post('/',[studentController::class,'create']);
+
+
+
+
+    public function edit($id)
+    {
+        $student=DB::table('students')->find($id);
+        return view('editform',['stu'=>$student]);
+    }
+//Route::get('/edit/{id}',[studentController::class,'edit'])->name('edit');
+
+//blade:
+<a  href="{{url('/edit',$stu->id)}}">#</a>   
+
+
+
+    public function update(Request $request, $id)
+    {
+        DB::table('students')->where('id',$id)->update([
+          'Name'=>$request->name,
+          'City'=>$request->city,
+          'Marks'=>$request->marks,
+        ]);
+        return redirect(route('index'))->with('status','Updated!!');
+    }
+
+//Route::put('/editform/{id}',[studentController::class,'update']);
+//blade:
+<a  href="{{url('/editform',$stu->id)}}">#</a>   
+
+
+
+    public function delete($id)
+    {
+        DB::table('students')->where('id',$id)->delete();
+        return redirect(route('index'))->with('status','Deleted');
+    }
+
+//Route::get('/delete/{id}',[studentController::class,'delete']);
+//blade:
+<a  href="{{url('/delete',$stu->id)}}">#</a>   
+
+
+
+
+
+All Route:
+Route::get('/',[studentController::class,'index'])->name('index');
+Route::post('/',[studentController::class,'create']);
+Route::get('/edit/{id}',[studentController::class,'edit'])->name('edit');
+Route::put('/editform/{id}',[studentController::class,'update']);
+Route::get('/delete/{id}',[studentController::class,'delete']);

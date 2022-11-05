@@ -1,0 +1,51 @@
+*Run:php artisan make:mail Testmail
+
+*.env:  
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME=mytest7733@gmail.com
+MAIL_PASSWORD=usebgmoufkielrrn
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=mytest7733@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"
+
+* Go to google account>Security>Turn on 2 step verification >
+* Go to google account>Security> app password > create new app > copy the password > paste in MAIL_PASSWORD
+
+***Controller.php:
+
+use App\Mail\TestMail;
+
+  method()
+
+  { 
+      $details=[
+         'title'=>'Text',
+         'body'=>'Text'
+          ];
+      Mail::to("To-email_address")->send(new TestMail($details));
+      Return "Email Sent";
+  }
+
+***app/Mail/TestMail.php
+
+   //inside TestMail class:
+   
+                public $details; //add
+
+                __construct($details)
+               {
+                 $this->details=$details; 
+                }
+
+                build()
+                {
+                   return $this->subject('Set Subject')->view('mail');  //mail.blade.php
+                }
+
+
+***mail.blade.php:
+
+<h1>{{$details['title']}}</h1>
+<p>{{$details['body']}}</p>

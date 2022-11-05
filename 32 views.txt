@@ -1,0 +1,12 @@
+@php
+                                                $ip=Request::ip();
+                                                if(!App\Models\View::where('ip',$ip)->where('prod_id',$product->id)->exists())
+                                                {
+                                                      $view=new App\Models\View;
+                                                      $view->prod_id=$product->id;
+                                                      $view->ip=$ip;
+                                                      $view->save();
+                                                }
+                                                $views=App\Models\View::where('prod_id',$product->id)->count();        
+                                          @endphp
+                                          Views: {{$views}}

@@ -1,0 +1,117 @@
+installation: 
+=======================================================
+*******************************************************
+1.run:composer require maatwebsite/excel --ignore-platform-reqs
+2.config/app.php:
+    'providers' => [
+    /*
+     * Package Service Providers...
+     */
+    Maatwebsite\Excel\ExcelServiceProvider::class,
+     ]
+
+     'aliases' => [
+           ...
+           'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+      ]
+
+3.run: php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider" --tag=config
+
+[without heading all column]
+==============================================
+**********************************************
+Exporting users table:  
+1.
+run:php artisan make:export UsersExport --model=User
+//create app/Exports/UserExport.php
+
+2.In controller:
+
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+
+
+3.In web.php
+
+Route::get('users/export/', [App\Http\Controllers\ExportController::class, 'export']);
+
+[with heading selected column]:
+===============================================
+***********************************************
+1.
+====
+run:php artisan make:export UsersExport --model=User
+//create app/Exports/UserExport.php
+
+
+
+
+2.In Models/User.php:
+====================
+use Illuminate\Support\Facades\DB;
+    public static function getUser()
+    {
+        $records=DB::table('users')->select('name','email','created_at')->get()->toArray();
+        return $records;
+    }
+
+
+3.In UserExport.php:
+====================
+<?php
+
+namespace App\Exports;
+use App\Models\User;
+use Maatwebsite\Excel\Concerns\FromCollection;
+
+use Maatwebsite\Excel\Concerns\WithHeadings;  //***
+
+class UsersExport implements FromCollection,WithHeadings   //***
+{
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+
+    public function headings():array{
+        return[
+            'name',
+            'email',
+            'created_at'
+        ];
+    }
+    public function collection()
+    {
+        // return User::all();
+        return collect(User::getUser());
+    }
+
+}
+
+3.In controller:
+=================
+
+
+
+    public function export_xlsx() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+    public function export_csv() 
+    {
+        return Excel::download(new UsersExport, 'users.csv');
+        // return Excel::download(new InvoicesExport, 'invoices.xlsx');
+    }
+
+
+
+4.In web.php:
+============
+
+
+Route::get('/users/export/xlsx', [App\Http\Controllers\ExportController::class, 'export_xlsx']);
+Route::get('/users/export/csv', [App\Http\Controllers\ExportController::class, 'export_csv']);

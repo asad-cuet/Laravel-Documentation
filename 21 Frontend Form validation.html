@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- **** -->      <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+ <!-- **** -->     <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js" integrity="sha512-eyHL1atYNycXNXZMDndxrDhNAegH2BDWt1TmkXJPoGf1WLlNYt08CSjkqF5lnCRmdm3IrkHid8s2jOUY4NIZVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <title>Document</title>
+
+<style>
+      .parsley-errors-list li {
+            list-style: none;
+            color: red;
+      }
+</style>      
+</head>
+<body>
+
+
+
+
+      <div class="w3-panel">
+            <div class="w3-border w3-border-blue w3-round" style="max-width:400px;width:100%;margin-left:auto;margin-right:auto">
+                               <div class="w3-container w3-blue">
+                                     <h3> Create</h3>
+                               </div>
+                               <div class="w3-container">
+                               
+                                    <form id="form">
+                               
+                                   <h6>Name</h6>
+                                   <input required data-parsley-pattern="[a-zA-Z ]+$" data-parsley-trigger="keyup" type="text" id="name" name="name" class="w3-block w3-border w3-border-gray w3-round w3-large"><br>  
+                                   
+                                   
+                                   
+ 
+                                   <h6>Email</h6>
+                                   <input required data-parsley-pattern="email" data-parsley-trigger="keyup" type="email" id="email" name="email" class="w3-block w3-border w3-border-gray w3-round w3-large"><br>  
+                                   
+                                     
+                                   <h6>Cell</h6>
+                                   <input required data-parsley-pattern="[0-9]+$" data-parsley-length="[10,13]" data-parsley-trigger="keyup" type="text" id="cell" name="cell" class="w3-block w3-border w3-border-gray w3-round w3-large"><br>  
+                                   
+                                   <h6>Password</h6>
+                                   <input required data-parsley-length="[6,12]" data-parsley-trigger="keyup" id="pass" type="password" id="password" name="cell" class="w3-block w3-border w3-border-gray w3-round w3-large"><br>  
+                                   
+                                   <h6>Confirm Password</h6>
+                                   <input required data-parsley-equalto="#pass" data-parsley-trigger="keyup" type="password" id="cell" name="cell" class="w3-block w3-border w3-border-gray w3-round w3-large"><br>  
+                                   
+                                     
+                                   <h6>Profile Picture</h6>
+                                   <input required type="file" id="image" name="image" class="w3-block w3-border w3-border-gray w3-round"><br>  
+                                   
+                                     
+                                
+                                   
+ 
+                                   <div class="w3-center w3-margin-top">
+                                   <button onclick="create()" class="w3-button w3-red w3-round">Create</button>
+                                   </div>
+                                   <br>
+                                  
+                                    
+                                   </form>
+                               </div> 
+ 
+                 
+                 
+                       </div>   
+ 
+            </div>
+ 
+
+
+<script>
+$(function(){
+      $("#form").parsley();
+});
+
+</script>      
+
+
+</body>
+</html>

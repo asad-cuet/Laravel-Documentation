@@ -1,0 +1,43 @@
+0.Add this to composer.json file:
+
+   "laravelium/sitemap": "8.*"
+
+
+1.Install package:
+
+    composer require laravelium/sitemap:8.0
+
+
+2.Publish view
+
+   php artisan vendor:publish --provider="Laravelium\Sitemap\SitemapServiceProvider"
+
+   // new file added public/vendor/...
+
+3.Web.php:
+
+    use Illuminate\Support\Facades\URL;
+    use App\Models\Product;
+
+
+Route::get('sitemap',function(){
+    $site=App::make('sitemap');
+
+    $site->add(URL::to('/'),date("Y-m-d h:i:s"),1,'daily');
+
+    $product=Product::all();
+    $category=Category::all();
+
+    foreach($product as $key=>$pt)
+    {
+        $site->add(URL::to($pt->slug),$pt->created_at,1,'daily');
+    }
+
+    foreach($category as $key=>$pt)
+    {
+        $site->add(URL::to($pt->slug),$pt->created_at,1,'daily');
+    }
+
+    $site->store('xml','sitemap');
+});
+

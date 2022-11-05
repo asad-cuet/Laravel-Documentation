@@ -1,0 +1,119 @@
+*Create Model:
+code:php artisan make:model Employee -m //add -m for migration
+
+*Create Yajra:
+Code:composer require yajra/laravel-datatables
+
+*Include class in the config/app.php,if included not
+
+
+*migration.php:create columns
+
+*Model/Emplyee.php:
+   protected $fillable=['name','age','salary'];
+
+*now migrate:php artisan migrate
+
+*Make Controller:
+Code:php artisan make:controller EmpController
+
+*Controller/EmpController.php:
+ 
+use App\Models\Employee;
+use DataTables;
+
+    index() 
+    {
+       return view('listing');
+    }
+
+    getEmployee(Request $request)
+    {
+         if($request->ajax())
+         {
+              $data=Emplyee::latest()->get();
+              return Datatables::of($data)
+                      ->addIndexColumn()
+                      ->addColumn('action',function($row)
+                                        {
+                                              $actionBtn='<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a>
+                                                          <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                                              return $actionBtn;
+                                         })
+                      ->raeColumns(['action'])
+                      ->make(true);
+          }
+       
+    }
+
+
+*Web.php:
+
+use App\Http\Controllers\EmpController;
+
+Route::get('employee',[EmpController::class,'index']);
+Route::get('emplyee/listing',[EmpController::class,'getEmplyee']->name('emp.listing');
+
+
+*listing.blade.php
+
+<header>
+
+use bootstrap 4.5.0/css.bootstrap.min.css
+use jquery.dataTables.min.css
+use css/dataTables.bootstrap4.min.css
+
+
+</header>
+<body>
+
+<table>
+
+<thead>
+    <tr>
+        <th>No.</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Salary</th>
+        <th>Action</th>
+    </tr>
+</thead>
+
+<tbody>
+</tbody>
+
+</table>
+
+
+use jquery
+use jquery.dataTables.min.js
+use jquery.validate.js
+use jquery.dataTables.min.js
+use bootstrap.min.js
+use dataTables.bootstrap.min.js
+
+<script> type="text/javascript">
+
+    $(function()
+    {
+        var table=$('.yajra-datatable').DataTable({
+                                processing:true,
+                                serverSide:true,
+                                ajax:"{{route('emp.listing')}}",
+                                columns:[
+                                           {data:'DT_RowIndex',name,'DT_RowIndex'},
+                                           {data:'name',name,'name'},
+                                           {data:'age',name,'age'},
+                                           {data:'salary',name,'salary'},
+                                           {
+                                                data:'action',
+                                                name:'action',
+                                                orderable:true,
+                                                searchable:true
+                                           },
+                                       ]
+                                                   });
+    });
+
+
+</body>

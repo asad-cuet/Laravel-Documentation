@@ -1,0 +1,2288 @@
+1.create new project    //out-topic: kill port cmd command:npx kill-port 3306.kill app:tasklist>Taskkill /PID 4132 /F
+
+2.connect database
+
+3.create ui system  //don't migrate now
+
+4.modify user migration:
+
+      add:$table->tinyInteger('role_as')->default('0');
+
+      //for placeOrder
+      $table->string('fname')->default(null);
+      $table->string('lname')->default(null);
+      $table->string('phone')->default(null);
+      $table->string('address1')->default(null);
+      $table->string('address2')->default(null);
+      $table->string('city')->default(null);
+      $table->string('state')->default(null);
+      $table->string('country')->default(null);
+      $table->string('pincode')->default(null); 
+
+
+5.migrate now
+
+
+6.admin middleware:
+
+      php artisan make:middleware AdminMiddleware
+
+
+7.replace in middleware:
+
+      use Illuminate\Support\Facades\Auth;
+      public function handle($request, Closure $next)
+    {
+        if(Auth::check())
+        {
+            if(Auth::user()->role_as == '1')
+            {
+                return $next($request);
+            }
+            else
+            {
+                return redirect('/home')->with('status','Access Denied! as you are not as admin');
+            }
+        }
+        else
+        {
+            return redirect('/home')->with('status','Please Login First');
+        }
+    }
+
+
+   
+
+
+8.Kernel.php:
+
+
+    protected $routeMiddleware = [
+
+        'isAdmin' => \App\Http\Middleware\AdminMiddleware::class, //Add to the end
+    ];
+
+
+9.Controllers/Auth/LoginController.php:
+
+       comment $redirectTo
+
+       paste:   
+     use Illuminate\Support\Facades\Auth; 
+    protected function authenticated()
+    {
+        if(Auth::user()->role_as == '1') //1 = Admin Login
+        {
+            return redirect('dashboard')->with('status','Welcome to your dashboard');
+        }
+        elseif(Auth::user()->role_as == '0') // Normal or Default User Login
+        {
+            return redirect('/')->with('status','Logged in successfully');
+        }
+    }
+
+
+     import Auth class [click>right-button,import class]
+
+
+10.web.php:
+
+      Route::middleware(['auth','isAdmin'])->group(function () {
+
+            Route::get('/dashboard', function () {
+                 return view('admin.dashboard');   //temporally use:return "Admin Login";
+                                  });
+
+          });
+
+11.edit role_as value in user table.create a new user as normal user
+
+Note:Now admin login redirect to different route from user
+
+
+12.Integrate Admin Dashboard:
+
+     template link:https://github.com/creativetimofficial/material-dashboard-bs4
+     web link:https://demos.creative-tim.com/
+
+     new file:views/layouts/admin.blade.php
+
+     new folder:public/admin/css/:paste template 'material..css'
+
+     new folder:public/admin/js/:paste template core js all' and plugin/perfect-scrollbar.jqu..js
+
+
+     new:layout/inc/
+            sidebar.blade.php:paste sidebar   modify tilte, replace href="#"
+            adminnav.blade.php:paste navbar
+            adminfooter.blade.php:paste footer
+
+
+     admin.blade.php:                      // asset('') redirect:public/
+             copy paste from app.blade.php 
+             clear body
+             replace font link from template dashboard
+             replace css links
+             take <div class="wrapper">all content here</div>
+             @include('layouts.inc.sidebar')
+             <div class="main-panel">
+             @include('layouts.inc.adminnav')
+             <div class="content">@yield('content')</div>                  <!-- includinh blade component -->
+             @include('layouts.inc.adminfooter')
+             </div>
+
+             paste core js files (all).modify src value
+             @yield('scripts')
+
+
+     new:views/admin/dashboard.blade.php:
+             @extends('layouts.admin')                                     <!-- showing main component  -->
+             
+             @section('content')
+                 .card>.card-body><h1>Welcome to dashboard</h1>
+             @endsection
+
+    replace logout button from app.blade.php with <form>
+
+Note:get login as admin
+
+
+
+13.Add Category table+Page:
+
+     php artisan make:model Category -m
+
+     paste on migration:
+       $table->string('name');
+       $table->string('slug');
+       $table->longText('description');
+       $table->tinyInteger('status')->default('0');
+       $table->tinyInteger('popular')->default('0');
+       $table->string('image')->default(null);
+       $table->string('meta_title');
+       $table->string('meta_descript');
+       $table->string('meta_keywords');
+
+
+     model:
+         protected $table='categories';
+         protected $fillable=['name','slug','description','status','popular','image','meta_title','meta_descrip','meta_keywords'];
+
+
+     php artisan migrate
+
+     new:views/admin/category/index.blade.php:
+             @section('content')
+                 .card>.card-body><h1>Cateogry</h1>
+             @endsection
+
+
+     php artisan make:controller Admin/CategoryController:
+                 index() {
+                    return view('admin.category.index');
+                          }
+
+     php artisan make:controller Admin/DashboardController:
+                 index() {
+                    return view('admin.dashboard');
+                          }
+
+
+     edit:
+
+        Route::get('/dashboard','Admin\DashboardController@index');
+
+     add:
+        Route::get('/categories','Admin\CategoryController@index');
+
+ 
+     register controller for not include class:
+          providers/RouteServiceProvider.php: uncomment $namespace
+
+
+     edit sidebar>category url:
+                  href="{{ url('/categories') }}"
+ 
+
+
+14.Integrate Category with your ajax
+
+
+15.Active navbar button:<li class="{{Request::is('categories') ? 'active':'' }}">  //if url=/categories
+
+
+16.Add Product table+page:
+
+
+      php artisan make:model Product -m
+
+
+
+      migration:
+                $table->bigInteger('cate_id');
+                $table->string('name');
+                $table->string('slug')->default(null);
+                $table->mediumText('small_description');
+                $table->longText('description');
+                $table->integer('original_price');
+                $table->integer('selling_price');
+                $table->string('image')->default(null);
+                $table->integer('qty');
+                $table->string('tax');
+                $table->tinyInteger('status');
+                $table->tinyInteger('trending');
+                $table->mediumText('meta_title');
+                $table->mediumText('meta_keywords');
+                $table->mediumText('meta_descript');
+
+
+      model:
+              protected $table='products'; 
+              protected $fillable=['cate_id','name','slug','small_description','description','original_price','selling_price','image','qty','tax','status','trending','meta_title','meta_keywords','meta_descript'];
+
+
+
+              public function category()  //making relationship
+                {
+                     return $this->belongsTo(Category::class,'cate_id','id');
+                }
+
+
+     do as Category
+
+
+     public function insert_form()
+        {
+            $category=Category::all();
+            return view('admin.product.add',['category'=>$category]);
+        }   
+
+
+      <div class="col-md-12 mb-3">
+                  <select class="form-select" aria-label="Default select example">
+                        <option selected>Open this select menu</option>
+                        @foreach($category as $item)
+                        <option value="{{$item->id}}">{{$item->name}}</option>
+                        @endforeach
+                  </select>
+       </div>      
+
+
+       fetch category:
+            {{$item->category->name}}   
+
+
+
+17.Frontend Layout:
+
+       new:layouts/frontend.blade.php:paste from admin,clear except links,modify link(use bootstrap) location,add on ul class="ms-auto",replace navbar class>dark
+       new:viws/frontend/dashboard.blade.php:do as admin dashboard
+       new:public/frontend/css & js
+       new:layouts/front_inc/:
+                           front_navbar.blade.php:use bootstrap,rename,remove fluid class,add on ul class="ms-auto",replace navbar class>dark
+                           slider.blade.php:use bootstrap,edit href="assets/images/.."
+
+
+       include front_inc.navbar in layouts/frontend
+       include front.slider in views/frontend/dashboard
+
+       php artisan make:controller Frontend/FrontendController:
+                             index() 
+                             {
+                                     $featured_product=Product::where('trending','1')->take(15)->get();
+                                     return view('frontend/dashboard',['feteaured_product'=>$featured_product]);
+                             }
+ 
+       web.php:
+               Route::get('/','Frontend/FrontendController@index');
+
+
+
+18.Product Slider:[web link:https://owlcarousel2.github.io/OwlCarousel2/]
+
+    include in layouts/frontend:
+       <link rel="stylesheet" href="owlcarousel/owl.carousel.min.css">
+       <link rel="stylesheet" href="owlcarousel/owl.theme.default.min.css">
+
+       <script src="jquery.min.js"></script>  
+       <script src="owlcarousel/owl.carousel.min.js"></script>
+
+
+    dashboard.blade.php:
+
+    <div class="py-5">
+      <div class="container">
+            <div class="row">
+                  <h2>Feteared Product</h2>
+                  <div class="owl-carousel featured-carousel owl-theme">
+                        @foreach ($feteaured_product as $item)
+                              <div class="item">
+                                    <div class="card">
+                                          <img src="{{asset('assets/uploads/product/'.$item->image)}}" alt="Product Image">
+                                          <div class="card-body">
+                                                <h5>{{$item->name}}</h5>
+                                                <span class="float-start">{{$item->selling_price}}</span>
+                                                <span class="float-end"><s>{{$item->original_price}}</s></span>
+                                          </div>
+                                    </div>
+                              </div>
+                        @endforeach
+                  </div>
+            </div>
+      </div>
+    </div>
+
+
+     also:
+            @section('scripts')
+            <script>
+                  $('.featured-carousel').owlCarousel({
+                        loop:true,
+                        margin:10,
+                        responsiveClass:true,
+                        responsive:{
+                        0:{
+                              items:1,
+                              nav:true
+                        },
+                        600:{
+                              items:3,
+                              nav:false
+                        },
+                        1000:{
+                              items:5,
+                              nav:true,
+                              loop:false
+                        }
+                        }
+                  })
+
+            </script> 
+            @endsection
+
+
+19.All category page:
+
+
+             add in navbar
+
+             new:frontend/category.blade.php:add web,cont.
+            
+   cont:
+    public function category() 
+    {
+        $category=Category::all();
+        return view('frontend/category',['category'=>$category]);
+
+    }
+
+
+   category-blade shape:
+
+
+<div class="py-5">
+      <div class="container">
+            <div class="row">
+                  <h2>All Categories</h2>
+                  
+                        @foreach ($category as $item)
+                             
+                              <div class="col-md-3 mb-3">
+                                    <a href="{{url('category/'.$item->slug)}}" >
+                                    <div class="card">
+                                          <img src="{{asset('assets/uploads/category/'.$item->image)}}" alt="Product Image">
+                                          <div class="card-body">
+                                                <h5>{{$item->name}}</h5>
+                                          </div>
+                                    </div>
+                                    </a>
+                              </div>
+                        @endforeach
+                  
+            </div>
+      </div>
+</div>
+
+
+
+
+
+
+20.view-category:
+
+             new:frontend/view-category.blade.php:add web,cont.
+
+   cont:
+    public function view_category($slug) 
+    {
+        if($category=Category::where('slug',$slug)->exists())
+        {
+            $category=Category::where('slug',$slug)->first();
+            $product=Product::where('cate_id',$category->id)->orderBy('id','DESC')->get();
+            return view('frontend/view-category',['product'=>$product,'category'=>$category]);
+        }
+        else
+        {
+            return view('frontend/dashboard')->with("status","Slug doesn't exist");
+        }
+        
+
+    }
+ 
+
+<div class="py-5">
+      <div class="container">
+            <div class="row">
+                  <h2>{{$category->name}}</h2>
+                 
+                        @foreach ($product as $item)
+                              <div class="col-md-3 mb-3">
+                                    <a href="{{url('category/'.$item->category->slug.'/'.$item->slug)}}">
+                                    <div class="card">
+                                          <img src="{{asset('assets/uploads/product/'.$item->image)}}" alt="Product Image">
+                                          <div class="card-body">
+                                                <h5>{{$item->name}}</h5>
+                                                <span class="float-start">{{$item->selling_price}}</span>
+                                                <span class="float-end"><s>{{$item->original_price}}</s></span>
+                                          </div>
+                                    </div>
+                                    </a>      
+
+                              </div>
+                        @endforeach
+                  
+            </div>
+      </div>
+</div>
+
+
+21.Add trending category in dashboard:
+
+           cont:
+    public function index() 
+    {
+        $feteared_product=Product::where('trending','1')->take(15)->get();
+        $trending_category=Category::where('popular','1')->take(15)->get();
+        return view('frontend/dashboard',['feteaured_product'=>$feteared_product,'trending_category'=>$trending_category]);
+
+    }
+  
+   paste feteaured product box in dashboard blade
+
+
+22.Make view-product:
+
+       new:viws/frontend/view-product.blade.php
+
+       <a href="{{url('category/'.$item->category->slug.'/'.$item->slug)}}">
+
+       web:Route::get('category/{cate_slug}/{prod_slug}','Frontend\FrontendController@view_product');
+
+
+  cont:
+    public function view_product($cate_slug,$prod_slug)
+    {
+        if(Category::where('slug',$cate_slug)->exists())
+        {
+            if(Product::where('slug',$prod_slug->exists))
+            {
+                $product=Product::where('slug',$prod_slug)->first();
+                return view('frontend/view-product',['product'=>$product]);
+            }
+            else
+            {
+                return view('frontend/view-product')->with('status','No such product found');
+            }
+        }
+        else
+        {
+        return view('frontend/view-product')->with('status','No such Category found');
+        }
+    }
+
+   blade box:
+
+@section('content')
+ <div class="py-3 mb-4 shadow-sm bg-warning border-top">
+      <div class="container">
+            <h6 class="mb-0">{{$product->category->name}}</h6>      
+      </div>       
+</div>      
+
+
+<div class="container">
+      <div class="card shadow product_data">
+            <div class="card-body">
+                  <div class="row">
+                        <div class="col-md-4 border-roght">
+                              <img src="{{asset('assets/uploads/product/'.$product->image)}}" alt="image" class="w-100">
+                        </div>
+                        <div class="col-md-8">
+                              <h2 class="mb-0">
+                                    {{$product->name}}
+                                    <label style="font-size:16px;" class="float-end badge bg-danger trending_tag">{{$product->trending==1 ? 'Trending':''}}</label>
+                              </h2>
+                              <hr>
+                              <label class="me-3">Original Price: <s>Rs {{$product->original_price}}</s></label>
+                              <label class="fw-bold">Selling Price: Rs {{$product->selling_price}}</label>
+                              <p class="mt-3">
+                                    {{$product->small_description}}     
+                              </p>
+                              <hr>
+                              @if($product->qty>0)
+                                    <label class="badge bg-success">In stock</label>
+                              @else       
+                                    <label class="badge bg-danger">Out of stock</label> 
+                              @endif
+                              <div class="row mt-2">
+                                     <div class="col-md-3">
+                                                <input type="hidden" value="{{$product->id}}" class="prod_id">
+                                                <label for="quantity">Quantity</label>
+                                                <div class="input-group text-center mb-3" style="width:130px;">
+                                                       <button class="input-group-text decrement-btn">-</button>
+                                                       <input type="text" name="quantity" value="1" class="form-control qty-input text-center" />
+                                                       <button class="input-group-text increment-btn">+</button>      
+                                                </div>       
+                                    </div> 
+                                    <div class="col-md-9">
+                                          <br/>
+                                          @if($product->qty>0)
+                                          <button type="button" class="btn btn-primary me-3 float-start  addToCartBtn">Add to Cart <i class="fa fa-shopping-cart"></i></button>                                          
+                                          @else       
+                                          <button type="button" class="btn btn-success me-3 float-start">Add to Wishlist <i class="fa fa-heart"></i></button>
+                                          @endif
+                                           
+                                                
+                                    </div>     
+                              </div>      
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>
+
+
+@endsection
+
+
+
+
+23.Integrate Google fonts and font awesome:
+ 
+     in layouts.frontend.blade.php:
+                  <link rel="preconnect" href="https://fonts.googleapis.com">
+                  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+
+                  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha384-jLKHWM3JRmfMU0A5x5AkjWkw/EYfGUAGagvnfryNV3F9VqM98XiIH7VBGVoxVSc7" crossorigin="anonymous">
+
+    add after Add to Wishlist<i class="fa fa-heart"></i>
+    add after Add to Cart<i class="fa fa-shopping-cart"></i>
+
+
+24.Button Increment decrement:
+
+
+       add class=decrement-btn/increment-btn
+       add on input class="qty qty-input"
+
+
+   <script>
+   $(document).ready(function(){
+         $('.increment-btn').click(function(e){
+               e.preventDefault();
+
+               var inc_value=$('.qty-input').val();
+               var value=parseInt(inc_value,10);
+               value=isNaN(value) ? 0:value;
+               if(value<10)
+               {
+                     value++;
+                     $('.qty-input').val(value);
+               }
+         });
+
+
+         $('.decrement-btn').click(function(e){
+               e.preventDefault();
+
+               var dec_value=$('.qty-input').val();
+               var value=parseInt(dec_value,10);
+               value=isNaN(value) ? 0:value;
+               if(value>1)
+               {
+                     value--;
+                     $('.qty-input').val(value);
+               }
+         });
+   });
+   </script>
+       
+
+
+
+25.Add to Cart activate:
+
+      php artisan make:model Cart -m
+
+      migration:
+          $table->string('user_id');
+          $table->string('prod_id');
+          $table->string('prod_qty');
+
+     model:
+      protected $table='carts';
+      protected $fillable=['user_id','prod_id','prod_qty'];
+    public function product()  //making relationship
+    {
+         return $this->belongsTo(Product::class,'prod_id','id');
+    }
+
+     migrate now
+
+     php artisan make:contrller Frontend/CartController
+
+
+     view_product.blade.php:
+          add:
+             input class="addToCartBtn"
+             add beside card class="product_data"
+             <input type="hidden" value="{{$product->id}}" class="prod_id">
+              
+
+
+          <script>   
+         $('.addToCartBtn').click(function(e){
+               e.preventDefault();
+               var product_id=$(this).closest('.product_data').find('.prod_id').val();
+               var product_qty=$(this).closest('.product_data').find('.qty-input').val();
+               
+
+               $.ajaxSetup({     //has extra code on head:<meta name="csrf-token" content="{{ csrf_token() }}">
+                  headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  }
+               });
+
+
+               $.ajax({
+                     method:"POST",
+                     url:"/add-to-cart",
+                     data:{
+                           'product_id':product_id,
+                           'product_qty':product_qty,
+                     },
+                     success:function(response) {
+                          swal(response.status);
+                     }
+               });
+            });
+         </script>
+
+    
+    web:Route::post('/add-to-cart','Frontend\CartController@addProduct');
+
+
+    cont:
+
+    use Illuminate\Support\Facades\Auth;
+    public function addProduct(Request $request)
+    {
+          $product_id=$request->input('product_id');
+          $product_qty=$request->input('product_qty');
+
+          if(Auth::check())
+          {
+              $prod_check=Product::where('id',$product_id)->first();
+              if($prod_check)
+              {
+                  if(Cart::where('prod_id',$product_id)->where('user_id',Auth::id())->exists())
+                  {
+                    return response()->json(['status'=>$prod_check->name.' Already Added to Cart']);
+                  }
+                  else
+                  {
+                  $cartItem=new Cart();
+                  $cartItem->user_id=Auth::id();
+                  $cartItem->prod_id=$product_id;
+                  $cartItem->prod_qty=$product_qty;
+                  $cartItem->save();
+                  return response()->json(['status'=>$prod_check->name.' Added to Cart']);
+                  }
+              }
+          }
+          else
+          {
+              return response()->json(['status'=>'Login to Continue']);
+          }
+    }
+
+
+26.Add login registrate user button on navbar from app.blade.php,home button from welcome.blade.php
+
+
+
+27.Cart Page+increment/drement+remove button:
+    
+***     add cart button on navbar
+
+***     new:views/frontend/cart.blade.php: //layout given in next point
+
+
+
+***    public function viewCart()
+    {
+        $product=Cart::orderBy('id','DESC')->get();
+        return view('frontend.cart',['product'=>$product]);
+    }
+
+
+****     script:   //this incre/decre script you can use also in view-product.better you should take all it in custom.js file.I took
+
+<script>
+$('.increment-btn').click(function(e){
+      e.preventDefault();
+
+      var inc_value=$(this).closest('.product_data').find('.qty-input').val();
+      var value=parseInt(inc_value,10);
+      value=isNaN(value) ? 0:value;
+      if(value<10)
+      {
+            value++;
+            $(this).closest('.product_data').find('.qty-input').val(value);
+      }
+});
+
+
+$('.decrement-btn').click(function(e){
+      e.preventDefault();
+
+      var dec_value=$(this).closest('.product_data').find('.qty-input').val();
+      var value=parseInt(dec_value,10);
+      value=isNaN(value) ? 0:value;
+      if(value>1)
+      {
+            value--;
+            $(this).closest('.product_data').find('.qty-input').val(value);
+      }
+});
+
+
+$('.delete-cart-item').click(function(e){
+      e.preventDefault();
+
+      var cart_id=$(this).closest('.product_data').find('.cart_id').val();
+
+      $.ajaxSetup({
+                  headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  }
+      });
+
+
+
+      $.ajax({
+            method:"POST",
+            url:"/delete-cart-item",
+            data:{
+                  'cart_id':cart_id
+            },
+            success:function(response) {
+                swal("",response.status, "success");
+            }
+      });
+
+});
+
+</script>
+
+
+****  web:
+
+Route::middleware('auth')->group(function() {
+    Route::get('/cart','Frontend\CartController@viewCart')->name('cart');
+    Route::post('/delete-cart-item','Frontend\CartController@deleteCartItem');
+});
+
+ 
+ 
+****  cont:
+
+
+    public function viewCart()
+    {
+        $product=Cart::where('user_id',Auth::id())->orderBy('id','DESC')->get();
+        return view('frontend.cart',['product'=>$product]);
+    }
+
+
+    public function deleteCartItem(Request $request)
+    {
+        $cart_id=$request->input('cart_id');
+        $cartItem=Cart::where('id',$cart_id)->first();
+        $cartItem->delete();
+        return response()->json(['status'=>'Product Deleted Successfully']);
+    }
+        
+
+
+
+28.Count price and update quantity:
+
+
+***   cart.blade.php:
+
+
+
+
+<div class="container my-5">
+      <div class="card shadow">
+            @if($product->count()>0)
+            <div class="card-body">
+                  @php $total=0; @endphp
+                  @foreach ($product as $item)
+                  <div class="row product_data">
+     
+                        <div class="col-md-2 my-auto">
+                              <img src="{{asset('assets/uploads/product/'.$item->product->image)}}" height="70px" width="70px" alt="Image">
+                        </div>
+                        <div class="col-md-3 my-auto">
+                            <h6>{{$item->product->name}}</h6>
+                        </div>
+                        <div class="col-md-2 my-auto">
+                            <h6>Rs {{$item->product->selling_price}}</h6>
+                        </div>
+                        <div class="col-md-3 my-auto">
+                              <input type="hidden" value="{{$item->id}}" class="cart_id">
+                              @if($item->product->qty >= $item->prod_qty)
+                              <label for="quantity">Quantity</label>
+                              <div class="input-group text-center mb-3" style="width:130px;">
+                                     <button class="input-group-text changeQuantity decrement-btn">-</button>
+                                     <input type="text" name="quantity" value="{{$item->prod_qty}}" class="form-control qty-input text-center" />
+                                     <button class="input-group-text changeQuantity increment-btn">+</button>      
+                              </div>  
+                              @php $total+=($item->product->selling_price)*($item->prod_qty); @endphp
+                              @else
+                                  <h6>Out of Stock</h6>                                  
+                              @endif
+                        </div>
+                        <div class="col-md-2 my-auto">
+                              <button class="btn btn-danger delete-cart-item"><i class="fa fa-trash"></i>Remove</button>
+                        </div>
+                         
+                  </div>
+                 
+                  
+                  @endforeach
+            </div>
+            <div class="card-footer">
+                  <h6>Total Price : Rs <span class="total">{{$total}}</span></h6>
+                  <a href="{{url('/checkout')}}" class="btn btn-outline-success float-end">Proceed to Checkout</a>
+            </div>
+            @else
+            <div class="card-body text-center">
+                  <h2>Your <i class="fa fa-shopping-cart"> Cart is empty</i></h2>
+                  <a href="{{url('/category')}}" class="btn btn-outline-primary float-end">Continue Shoppinh</a>
+            </div>
+            @endif
+      </div>
+</div>
+
+
+***   script:
+       <script>
+            $('.changeQuantity').click(function(e){
+                  e.preventDefault();
+
+                  var cart_id=$(this).closest('.product_data').find('.cart_id').val();
+                  var qty=$(this).closest('.product_data').find('.qty-input').val();
+
+                  $.ajax({
+                        method:"POST",
+                        url:"/update-cart",
+                        data:{
+                              'cart_id':cart_id,
+                              'prod_qty':qty,
+                        },
+                        success:function(response) {
+                        if(response.status=='out_of_stock')
+                        {
+                              var val=$('.qty-input').val();
+                              val--;
+                              $('.qty-input').val(val);
+                              swal("Out of stock.Increment Failed");
+                        }
+                        else 
+                        {
+                              $('.total').html(response.status);
+                        }
+                        
+                        //console.log(response.status);
+                        }
+                  });
+
+            });
+      </script>
+
+
+***   web inside 'auth' middleware:Route::post('/update-cart','Frontend\CartController@updateCart');
+
+
+
+***   cont:
+
+    public function updateCart(Request $request)
+    {
+        $cart_id=$request->input('cart_id');
+        $prod_qty=$request->input('prod_qty');
+        if(Cart::where('id',$cart_id)->exists())
+        {
+            $cart=Cart::where('id',$cart_id)->first();
+            if(($cart->product->qty) >= ($prod_qty))
+            {
+                $cart->prod_qty=$prod_qty;
+                $cart->update();
+     
+                $cart2=Cart::where('user_id',Auth::id())->get();
+                $total=0;
+                foreach($cart2 as $item)
+                {
+                     $total+=($item->product->selling_price)*($item->prod_qty);
+                } 
+                return response()->json(['status'=>$total]);
+            }
+            else
+            {
+                return response()->json(['status'=>'out_of_stock']);
+            }
+
+        }
+    }
+
+
+29.Checkout page:
+
+     new:views/frontend/checkout.blade.php
+
+     php artisan make:controller Frontend/CheckoutController
+
+    web inside auth:Route::get('/checkout','Frontend\CheckoutController@index');
+
+    cont:
+
+    public function index()
+    {
+        $old_cartitems=Cart::where('user_id',Auth::id())->get();
+        
+        foreach($old_cartitems as $item)
+        {
+            if(Product::where('id',$item->prod_id)->where('qty','<',$item->prod_qty)->exists())
+            {
+             //   $p=Product::where('id',$item->prod_id)->where('qty','<',$item->prod_qty)->first();
+           //    dd($p->qty);
+                $removeItem=Cart::where('user_id',Auth::id())->where('prod_id',$item->prod_id)->first();
+                $removeItem->delete();
+            }
+        }
+
+        $cartitems=Cart::where('user_id',Auth::id())->get();
+        return view('frontend/checkout',['cartitems'=>$cartitems]);
+    }
+
+
+   layout:next point
+
+
+30.placeorder:
+
+   php artisan make:model Order -m
+
+   migration:
+      $table->integer('user_id');
+      $table->string('fname');
+      $table->string('lname');
+      $table->string('email');
+      $table->string('phone');
+      $table->string('address1');
+      $table->string('address2')->default(null);
+      $table->string('city');
+      $table->string('state');
+      $table->string('country');
+      $table->string('pincode');
+      $table->longInteger('total_price')->default(null);
+      $table->tinyInteger('status')->default('0');
+      $table->string('message')->default(null)();
+      $table->string('tracking_no');  //randomely
+
+   model:
+      protected $table='orders';
+      protected $fillable=['user_id','fname','lname','email','phone','address1','address2','city','state','country','pincode','totoal_price','status','message','tracking_no'];
+      public function orderItem()  //making relationship
+      {
+         return $this->hasMany(Orderitem::class);
+      }
+
+
+
+
+
+
+   php artisan make:model OrderItem -m
+
+   migration:
+      $table->string('order_id');  //relation with Order>id
+      $table->string('prod_id');
+      $table->integer('qty');
+      $table->integer('price');
+  
+   model:
+      protected $table='order_items';
+      protected $fillable=['order_id','prod_id','price','qty'];
+    public function product()  //making relationship
+    {
+         return $this->belongsTo(Product::class,'prod_id','id');
+    }  
+ 
+   php artisan migrate    
+
+   web in auth:Route::get('/place-order','Frontend\CheckoutController@placeOrder');
+
+  
+   layout:
+
+<div class="container mt-5">
+   <form action="{{url('/place-order')}}" method="POST">
+      @csrf  
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="card">
+                        <div class="card-body">
+                              <h6>Basic Details</h6>
+                              <hr>
+                              <div class="row checkout-form">
+                                    <div class="col-md-6">
+                                          <label for="">First Name</label>
+                                          <input required type="text" name="fname" value="{{Auth::user()->fname}}" class="form-control" placeholder="Enter First Name">
+                                    </div>
+                                    <div class="col-md-6">
+                                          <label for="">Last Name</label>
+                                          <input required type="text" name="lname" value="{{Auth::user()->lname}}" class="form-control" placeholder="Enter Last Name">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">Email</label>
+                                          <input required type="email" name="email" value="{{Auth::user()->email}}" class="form-control" placeholder="Enter Email">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">Phone number</label>
+                                          <input required type="text" name="phone" value="{{Auth::user()->phone}}" class="form-control" placeholder="Enter Phone Number">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">Address 1</label>
+                                          <input required type="text" name="address1" value="{{Auth::user()->address1}}" class="form-control" placeholder="Enter Address 1">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">Address 2</label>
+                                          <input type="text" name="address2" value="{{Auth::user()->address2}}" class="form-control" placeholder="Enter Address 2">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">City</label>
+                                          <input required type="text" name="city" value="{{Auth::user()->city}}" class="form-control" placeholder="Enter City">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">State</label>
+                                          <input required type="text" name="state" value="{{Auth::user()->state}}" class="form-control" placeholder="Enter State">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">Country</label>
+                                          <input required type="text" name="country" value="{{Auth::user()->country}}" class="form-control" placeholder="Enter Country">
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                          <label for="">Pin Code</label>
+                                          <input required type="password" name="pincode" value="{{Auth::user()->pincode}}" class="form-control" placeholder="Enter Pin Code">
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-7">
+                  <div class="card">
+                        <div class="card-body">
+                              Order Details
+                              <hr>
+                              <table class="table table-striped table-bordered">
+                                    <thead>
+                                          <tr>
+                                                <th>Name</th>
+                                                <th>Qty</th>
+                                                <th>Price</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody>
+                                          @php $total=0; @endphp
+                                          @foreach ($cartitems as $item)
+                                              <tr>
+                                                    <td>{{$item->product->name}}</td>
+                                                    <td>{{$item->prod_qty}}</td>
+                                                    <td>{{$item->product->selling_price}}</td>
+                                              </tr>
+                                          @php $total+=($item->product->selling_price)*($item->prod_qty); @endphp    
+                                          @endforeach
+                                    </tbody>
+                              </table>
+                              <h6>Total : Rs {{$total}}</h6>
+                              <hr>
+                              <input type="hidden" name="payment_mode" value="COD">
+                              <button type="submit " class="btn btn-primary w-100">Place Order</button>
+                        </div>
+                  </div>
+            </div>
+      </div> 
+   </form>   
+</div>
+
+
+
+   cont:
+
+    public function placeOrder(Request $request)
+    {
+
+         if(!Cart::where('user_id',Auth::id())->exists())
+         {
+            return redirect('/')->with('status','Add Product to Cart first!');
+         }
+
+         $cartitems=Cart::where('user_id',Auth::id())->get();
+         $total_price=0;
+         foreach($cartitems as $item)
+         {
+             $total_price+=($item->product->selling_price) * ($item->prod_qty);
+
+         }     
+
+
+         $order=new Order();
+         $order->user_id = Auth::id();
+         $order->fname = $request->input('fname');
+         $order->lname = $request->input('lname');
+         $order->email = $request->input('email');
+         $order->phone = $request->input('phone');
+         $order->address1 = $request->input('address1');
+         $order->address2 = $request->input('address2');
+         $order->city = $request->input('city');
+         $order->state = $request->input('state');
+         $order->country = $request->input('country');
+         $order->pincode = $request->input('pincode');
+         $order->total_price = $total_price;
+         $order->tracking_no = 'asad'.rand(1111,9999);
+         $order->save();
+         foreach($cartitems as $item)
+         {
+             OrderItem::create([
+                 'order_id'=>$order->id,
+                 'prod_id'=>$item->prod_id,
+                 'qty'=>$item->prod_qty,
+                 'price'=>$item->product->selling_price,
+             ]);
+
+             //reducing quantity
+             $prod=Product::where('id',$item->prod_id)->first();
+             $prod->qty=$prod->qty - $item->prod_qty;
+             $prod->update();
+         }   
+         
+         
+         if(Auth::user()->address1==NULL)
+         {
+             $user=User::where('id',Auth::id())->first();
+             $user->fname = $request->input('fname');
+             $user->lname = $request->input('lname');
+             $user->phone = $request->input('phone');
+             $user->address1 = $request->input('address1');
+             $user->address2 = $request->input('address2');
+             $user->city = $request->input('city');
+             $user->state = $request->input('state');
+             $user->country = $request->input('country');
+             $user->pincode = $request->input('pincode');
+             $user->update();
+         }
+
+         $cartitems=Cart::where('user_id',Auth::id())->get();
+         Cart::destroy($cartitems);
+
+         return redirect('/')->with('status','Order Placed Successfully');
+         
+    }
+
+
+   
+
+31.Show order history in frontend:
+
+     php artisan make:controller Frontend/UserController 
+
+     new:views/user/my-order.blade.php & view-order.blade.php
+
+     web:Route::get('/my-orders','Frontend\UserController@index');
+
+     cont:
+
+    public function index()
+    {
+        $my_order=Order::where('user_id',Auth::id())->orderBy('id','DESC')->get();
+        return view('frontend.order.my-order',['my_order'=>$my_order]); 
+    }
+
+    add on navbar
+
+
+    my-order:
+
+      <div class="row">
+            <div class="col-md-12">
+                  <div class="card">
+                        <div class="card-header">
+                           <h4>My Orders</h4>
+                        </div>
+                        <div class="card-body">
+                                    <table class="table table-bordered">
+                                          <thead>
+                                                <tr>
+                                                      <th>Tracking Number</th>
+                                                      <th>Total Price</th>
+                                                      <th>Status</th>
+                                                      <th>Action</th>
+                                                </tr>
+                                          </thead>
+                                          <tbody>
+                                                @foreach ($my_order as $item)
+                                                    <tr>
+                                                          <td>{{$item->tracking_no}}</td>
+                                                          <td>{{$item->total_price}}</td>
+                                                          <td>{{$item->status==0 ? 'Pending':'Completed'}}</td>
+                                                          <td>
+                                                                <a href="{{url('/view-order/'.$item->id)}}" class="btn btn-primary">View</a>
+                                                          </td>
+                                                      </tr>          
+                                                @endforeach
+                                          </tbody>
+                                    </table>
+                        </div>
+                  </div>
+
+            </div>
+      </div>
+
+
+32.View Order Details:
+
+     view-order:
+
+<div class="container py-5">
+      
+      <div class="row">
+            <div class="col-md-12">
+                  <div class="card">
+                        <div class="card-header">
+                           <h4>Order View
+                                 <a href="{{url('my-orders')}}" class="btn btn-warning text-white float-end">Back</a>
+                           </h4>
+                        </div>
+                        <div class="card-body">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                          <h4>Shopping Details</h4>
+                                          <hr>
+                                              <label for="">First Name</label>
+                                              <div class="border p-2">{{$order->fname}}</div>
+                                              <label for="">Last Name</label>
+                                              <div class="border p-2">{{$order->lname}}</div>
+                                              <label for="">Email</label>
+                                              <div class="border p-2">{{$order->email}}</div>
+                                              <label for="">Contact No.</label>
+                                              <div class="border p-2">{{$order->phone}}</div>
+                                              <label for="">Shipping Address</label>
+                                              <div class="border p-2">{{$order->address1.','.$order->address2.','.$order->city.','.$order->state.','.$order->country}}</div>
+                                              <label for="">Zip Code.</label>
+                                              <div class="border">{{$order->pincode}}</div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                          <h4>Order Details</h4>
+                                          <hr>
+                                          <div style="overflow-x:auto;">
+                                          <table class="table table-bordered">
+                                                <thead>
+                                                      <tr>
+                                                            <th>Name</th>
+                                                            <th>Quantity</th>
+                                                            <th>Price</th>
+                                                            <th>Image</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody>
+                                                      @foreach ($order->orderItem as $item)
+                                                          <tr>
+                                                                <td>{{$item->product->name}}</td>
+                                                                <td>{{$item->qty}}</td>
+                                                                <td>{{$item->price}}</td>
+                                                                <td>
+                                                                      <img src="{{asset('assets/uploads/product/'.$item->product->image)}}" width="50px" alt="Product Image">
+                                                                </td>
+                                                            </tr>          
+                                                      @endforeach
+                                                </tbody>
+                                          </table>
+                                          </div>
+                                          <h4 class="px-2">Grand Total:<span class="float-end">Rs {{$order->total_price}}</span></h4>
+                                    </div>
+                              </div>
+
+                        </div>
+                  </div>
+
+            </div>
+      </div>
+</div>
+
+
+     web:Route::get('/view-order/{order_id}','Frontend\UserController@view_order');
+
+
+
+    cont:
+
+
+    public function view_order($order_id)
+    {
+        $order=Order::where('id',$order_id)->where('user_id',Auth::id())->first();
+        return view('frontend.order.view-order',['order'=>$order]);
+    }
+
+
+33.Show order+view in admin panel:
+
+     add butoon on sidebar
+
+     new:views/admin/order/order.blade.php
+
+     php artisan make:controller Admin/OrderController
+
+     web in auth,isAdmin:Route::get('/orders','Admin\OrderController@index');
+
+     cont:
+    public function index()
+    {
+        $order=Order::where('status',0)->orderBy('id','DESC')->get();
+        return view('admin.order.order',['order'=>$order,'status'=>0]);
+    }
+
+    layout:    
+<div class="container">
+      <div class="row">
+            <div class="col-md-12">
+                  <div class="card">
+                        <div class="card-header bg-primary">
+                              <h4 class="text-white">
+                                    @if($status==0)
+                                    New Orders
+                                    <a href="{{url('/order-history')}}" class="btn btn-warning text-white float-right">Order History</a>
+                                    @elseif($status==1)
+                                    Order History
+                                    <a href="{{url('/orders')}}" class="btn btn-warning text-white float-right">New Orders</a>
+                                    @endif
+                              </h4>
+                        </div>
+                        <div class="card-body">
+                              <table class="table table-bordered">
+                                    <thead>
+                                          <tr>
+                                                <th>Order Date</th>
+                                                <th>Tracking Number</th>
+                                                <th>Total Price</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody>
+                                          @foreach ($order as $item)
+                                              <tr>
+                                                    <td>{{date('d-m-Y',strtotime($item->created_at))}}</td>
+                                                    <td>{{$item->tracking_no}}</td>
+                                                    <td>{{$item->total_price}}</td>
+                                                    <td>{{$item->status==0 ? 'Pending':'Completed'}}</td>
+                                                    <td>
+                                                          <a href="{{url('/admin/view-order/'.$item->id)}}" class="btn btn-primary">View</a>
+                                                    </td>
+                                                </tr>          
+                                          @endforeach
+                                    </tbody>
+                              </table>
+                  </div>
+                  </div>
+            </div>
+      </div>
+</div>
+
+
+**** view:
+
+     new:views/admin/order/view-order.blade.php
+
+    web:Route::get('/admin/view-order/{order_id}','Admin\OrderController@view_order');
+
+
+    cont:
+    public function view_order($order_id)
+    {
+        $order=Order::where('id',$order_id)->first();
+        return view('admin.order.view-order',['order'=>$order]);
+    }
+
+    layout:
+<div class="container">
+      
+      <div class="row">
+            <div class="col-md-12">
+                  <div class="card">
+                        <div class="card-header">
+                           <h4>Order View
+                                 @if($order->status==0)
+                                 <a href="{{url('/orders')}}" class="btn btn-warning text-white float-right">Back</a>
+                                 @elseif($order->status==1)
+                                 <a href="{{url('/order-history')}}" class="btn btn-warning text-white float-right">Back</a>
+                                 @endif
+                           </h4>
+                        </div>
+                        <div class="card-body">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                          <h4>Shopping Details</h4>
+                                          <hr>
+                                              <label for="">First Name</label>
+                                              <div class="border p-2">{{$order->fname}}</div>
+                                              <label for="">Last Name</label>
+                                              <div class="border p-2">{{$order->lname}}</div>
+                                              <label for="">Email</label>
+                                              <div class="border p-2">{{$order->email}}</div>
+                                              <label for="">Contact No.</label>
+                                              <div class="border p-2">{{$order->phone}}</div>
+                                              <label for="">Shipping Address</label>
+                                              <div class="border p-2">{{$order->address1.','.$order->address2.','.$order->city.','.$order->state.','.$order->country}}</div>
+                                              <label for="">Zip Code.</label>
+                                              <div class="border">{{$order->pincode}}</div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                          <h4>Order Details</h4>
+                                          <hr>
+                                          <div style="overflow-x:auto;">
+                                          <table class="table table-bordered">
+                                                <thead>
+                                                      <tr>
+                                                            <th>Name</th>
+                                                            <th>Quantity</th>
+                                                            <th>Price</th>
+                                                            <th>Image</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody>
+                                                      @foreach ($order->orderItem as $item)
+                                                          <tr>
+                                                                <td>{{$item->product->name}}</td>
+                                                                <td>{{$item->qty}}</td>
+                                                                <td>{{$item->price}}</td>
+                                                                <td>
+                                                                      <img src="{{asset('assets/uploads/product/'.$item->product->image)}}" width="50px" alt="Product Image">
+                                                                </td>
+                                                            </tr>          
+                                                      @endforeach
+                                                </tbody>
+                                          </table>
+                                          </div>
+                                          <h4 class="px-2">Grand Total:<span class="float-end">Rs {{$order->total_price}}</span></h4>
+                                          <div class="mt-3 px-2">
+                                                <label for="" class="">Order Status</label>
+                                                <form action="{{url('/update-order/'.$order->id)}}" method="POST">
+                                                      @csrf
+                                                      @method('PUT')
+                                                            <select class="form-select form-control border" name="order_status">
+                                                            <option {{$order->status==0? 'selected':''}} value="0">Pending</option>
+                                                            <option {{$order->status==1? 'selected':''}} value="1">Completed</option>
+                                                            </select>
+                                                            <button type="submit" class="btn btn-primary mt-3 float-end">Update</button>
+                                                </form>
+                                                
+                                          </div>
+                                          
+                                    </div>
+                              </div>
+
+                        </div>
+                  </div>
+
+            </div>
+      </div>
+</div>
+
+
+**** update order in view:
+
+     web: Route::put('/update-order/{order_id}','Admin\OrderController@update_order');                               
+
+
+    cont:
+    public function update_order(Request $request,$order_id)
+    {
+        $order=Order::find($order_id);
+        $order->status=$request->input('order_status');
+        $order->update();
+        return redirect('orders')->with('status','Order Status Updated Successfully');
+    }
+
+
+**** completed order:
+
+    button in order page added before
+
+   web:Route::get('/order-history','Admin\OrderController@order_history'); 
+
+
+   cont:
+    public function order_history()
+    {
+        $order=Order::where('status',1)->orderBy('id','DESC')->get();
+        return view('admin.order.order',['order'=>$order,'status'=>1]);
+    }
+
+
+
+
+34.Show Registrate User+View
+
+   php artisan make:controller Admin/UserController
+
+
+   new:views/admin/users/users.blade.php
+
+   Add button on sidebar
+
+
+   web:Route::get('/users','Admin\UserController@index'); 
+
+   cont:
+    public function index()
+    {
+        $users=User::orderBy('id','DESC')->get();
+        return view('admin.users.users',['users'=>$users]);
+    }
+
+
+   layout:
+<div class="card">
+      <div class="card-header bg-primary text-white">
+                  <h4>Registered Users</h4>
+      </div>
+
+      <div class="card-body">
+             <table class="table">
+                   <thead>
+                         <tr>
+                               <th>Id</th>
+                               <th>Name</th>
+                               <th>Email</th>
+                               <th>Phone</th>
+                               <th>Action</th>
+                         </tr>
+                  </thead>
+                  <tbody>
+                        @foreach ($users as $item)
+                        <tr>
+                              <td>{{$item->id}}</td>              
+                              <td>{{$item->name}}</td> 
+                              <td>{{$item->email}}</td>             
+                              <td>{{$item->phone}}</td>             
+                              <td>
+                                    <a href="{{url('view-user/'.$item->id)}}" class="btn btn-primary">View</a>
+                              </td>              
+                        </tr>
+                        @endforeach
+
+                  </tbody>
+            </table>                                
+      </div>
+</div>
+
+
+**** view:
+
+
+   web:Route::get('/view-user/{user_id}','Admin\UserController@view_user');
+
+  cont:
+    public function view_user($user_id)
+    {
+        $user=User::find($user_id);
+        return view('admin.users.view-user',['user'=>$user]);
+    }
+
+   layout:
+<div class="container py-5">
+      
+      <div class="row">
+            <div class="col-md-12">
+                  <div class="card">
+                        <div class="card-header">
+                           <h4>User Details
+                                 <a href="{{url('users')}}" class="btn btn-warning text-white float-right">Back</a>
+                           </h4>
+                        </div>
+                        <div class="card-body">
+                              <div class="row">
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">Role</label>
+                                              <div class="border p-2">{{$user->role_as==0 ? 'User':'Admin'}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">First Name</label>
+                                              <div class="border p-2">{{$user->fname}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">Last Name</label>
+                                              <div class="border p-2">{{$user->lname}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3"><label for="">Email</label>
+                                          <div class="border p-2">{{$user->email}}</div></div>
+                                    <div class="col-md-4 mt-3"><label for="">Phone</label>
+                                          <div class="border p-2">{{$user->phone}}</div></div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">Address 1</label>
+                                              <div class="border p-2">{{$user->address1}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">Address 1</label>
+                                              <div class="border p-2">{{$user->address2}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">City</label>
+                                              <div class="border">{{$user->city}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">State.</label>
+                                              <div class="border">{{$user->state}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">Country</label>
+                                              <div class="border">{{$user->country}}</div>
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                          <label for="">Pin Code</label>
+                                          <div class="border">{{$user->pincode}}</div>
+                                    </div>                                 
+
+                              </div>
+
+                        </div>
+                  </div>
+
+            </div>
+      </div>
+</div>
+
+
+
+
+35.Add to wishlist:
+
+    php artisan make:model Wishlist -m
+
+    migration:
+       $table->integer('user_id');
+       $table->integer('prod_id');
+
+    model:
+      protected $table='wishlists';
+      protected $fillable=['user_id','prod_id'];
+    public function product()  //making relationship
+    {
+         return $this->belongsTo(Product::class,'prod_id','id');
+    }  
+
+
+    php artisan migrate
+
+
+
+    php artisan make:controller Frontend/WishlistController
+
+
+    new:views/frontend/wishlist/wishlist.blade.php
+
+    add button on navbar dropdown
+
+
+    web in auth:Route::get('/wishlist','Frontend\WishlistController@index');
+
+    layout:
+<div class="container my-5">
+      <div class="card shadow">
+            @if($wishlist->count()>0)
+            <div class="card-body">
+                 
+                  @foreach ($wishlist as $item)
+                  <div class="row product_data">
+     
+                        <div class="col-md-2 my-auto">
+                              <img src="{{asset('assets/uploads/product/'.$item->product->image)}}" height="70px" width="70px" alt="Image">
+                        </div>
+                        <div class="col-md-2 my-auto">
+                            <h6>{{$item->product->name}}</h6>
+                        </div>
+                        <div class="col-md-2 my-auto">
+                            <h6>Rs {{$item->product->selling_price}}</h6>
+                        </div>
+                        <div class="col-md-2 my-auto">
+                              <input type="hidden" value="{{$item->product->id}}" class="prod_id">
+                              <input type="hidden" value="{{$item->id}}" class="wish_id">
+                        @if($item->product->qty>0)
+                              <label class="badge bg-success">In stock</label>
+                              @else       
+                              <label class="badge bg-danger">Out of stock</label> 
+                        @endif
+                        </div>
+                        <div class="col-md-2 my-auto">
+                              <input type="hidden" name="quantity" value="1" class="form-control qty-input text-center" />
+                              <button class="btn btn-success addToCartBtn"><i class="fa fa-shopping-cart"></i>Add to Cart</button>
+                        </div>
+                        <div class="col-md-2 my-auto">
+                              <button class="btn btn-danger delete-wishlist-item"><i class="fa fa-trash"></i>Remove</button>
+                        </div>
+                         
+                  </div>
+                 
+                  
+                  @endforeach
+            </div>
+
+            @else
+            <div class="card-body text-center">
+                  <h2>Your <i class="fa fa-shopping-cart"> Wishlist is empty</i></h2>
+                  <a href="{{url('/category')}}" class="btn btn-outline-primary float-end">Continue Shoppinh</a>
+            </div>
+            @endif
+      </div>
+</div>
+
+
+*** active wishlist button in view-product page:
+
+
+    <button type="button" class="btn btn-success addToWishlist me-3 float-start">Add to Wishlist <i class="fa fa-heart"></i></button>
+
+
+   <script>
+
+            $('.addToWishlist').click(function(e){
+               e.preventDefault();
+               var product_id=$(this).closest('.product_data').find('.prod_id').val();
+               
+      
+
+               $.ajax({
+                     method:"POST",
+                     url:"/add-to-wishlist",
+                     data:{
+                           'prod_id':product_id                     },
+                     success:function(response) {
+                          swal(response.status);  
+                     }
+               });
+            });
+
+   </script>
+
+
+  web:Route::post('/add-to-wishlist','Frontend\WishlistController@add_to_wishlist');
+
+
+
+   cont:
+
+    public function add_to_wishlist(Request $request)
+    {
+        if(Auth::check())
+        {
+            $prod_id=$request->input('prod_id');
+            if(Product::find($prod_id))
+            {
+                if(!Wishlist::where('user_id',Auth::id())->where('prod_id',$prod_id)->exists())
+                {
+                    $wish=new Wishlist();
+                    $wish->prod_id=$prod_id;
+                    $wish->user_id=Auth::id();
+                    $wish->save();
+                    return response()->json(['status'=>"Product Added to Wishlist"]);
+                }
+                else
+                {
+                    return response()->json(['status'=>"Product has already added"]);
+                }
+
+
+            }
+            else
+            {
+                return response()->json(['status'=>"Product doesn't exist"]);
+            }
+        }
+        else
+        {
+            return response()->json(['status'=>"Login to Continue"]);
+        }
+    }
+
+
+*** add to cart:
+    button added in layout
+
+
+   script:same as add to cart
+
+
+
+*** remove from wishlist:
+
+   button added in layout
+
+   script:
+            $('.delete-wishlist-item').click(function(e){
+                  e.preventDefault();
+
+                  var wish_id=$(this).closest('.product_data').find('.wish_id').val();
+
+
+
+
+                  $.ajax({
+                        method:"POST",
+                        url:"/delete-wishlist-item",
+                        data:{
+                              'wish_id':wish_id
+                        },
+                        success:function(response) {
+                        swal("",response.status, "success");
+                        }
+                  });
+
+            });
+
+
+
+     web: Route::post('/delete-wishlist-item','Frontend\WishlistController@delete_wishlist_item');
+
+
+    cont:
+    public function delete_wishlist_item(Request $request)
+    {
+        $wish_id=$request->input('wish_id');
+        $wishItem=Wishlist::where('id',$wish_id)->first();
+        $wishItem->delete();
+        return response()->json(['status'=>'Product Deleted Successfully']);
+    }
+
+
+
+36.Add Quantity on Cart,wishlist button in nav:
+
+   layout:
+            <li class="nav-item">
+              <a class="nav-link {{Request::is('cart') ? 'active':'' }}" href="{{url('/cart')}}"><i class="fa fa-shopping-cart"></i> Cart
+              <span class="badge badge-pill bg-primary cart-count">0</span>
+              </a>
+            </li>
+            
+
+            <li class="nav-item">
+              <a class="nav-link {{Request::is('wishlist') ? 'active':'' }}" href="{{url('/wishlist')}}"><i class="fa fa-wish-list"></i> Wishlist
+                <span class="badge badge-pill bg-success wish-count">0</span>
+              </a>
+            </li>
+
+   script:
+         function loadcart()
+         {
+               $.ajax({
+                    method:"GET",
+                    url:"/load-cart-data",
+                    success:function(response)
+                    {
+                         //alert(response.count);
+                         //$('.cart-count').html(''); 
+                         $('.cart-count').html(response.cartcount); 
+                         $('.wish-count').html(response.wishcount); 
+                    }
+               });
+         }
+         loadcart();
+
+    call this on :addToCart,delete-cart-item,addToWishlist,delete-wishlist-item
+
+     
+    web:Route::get('/load-cart-data','Frontend\CartController@load_cart_data');
+
+
+   cont:
+    public function load_cart_data()
+    {
+        if(Auth::check())
+        {
+            $cartcount=Cart::where('user_id',Auth::id())->count();
+            $wishcount=Wishlist::where('user_id',Auth::id())->count();
+            return response()->json(['cartcount'=>$cartcount,'wishcount'=>$wishcount]);
+        }
+
+    }
+
+
+
+
+
+37.Checkout validation with js:
+
+     new:public/js/checkout.js
+
+
+     include js file in front layout
+
+     add button to process
+     take input and validate by checkout.js,
+     then pass to php,
+     calculate total_price,
+     back all again
+     
+
+
+     go to:razorpay.com>resource>develper-docs>   [pass:your common]
+     web-integration:manual checkout with handler function>
+     follow the step
+
+     step:
+        add button://we already added
+        copy script lint in js section in checkout page
+        copy script code inside response function
+        remove failed code,click function[start-end] because we already added
+        paste key id
+        edit:amount,name,description:thank you
+         
+        erase handler except payment_id
+        edit:prefill
+        remove notes
+        half-done,you can see payment modal
+        after success payment you need to store data in db--
+        write ajax inside handler beloy the payment_id
+
+
+     as:
+var options = {
+                              "key": "rzp_test_XRpVzatl7Qgfl7", // Enter the Key ID generated from the Dashboard
+                              "amount": response.total_price*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                              "currency": "INR",
+                              "name": response.fname+' '+response.lname,
+                              "description": "Thank you for chosing us",
+                              "image": "https://example.com/your_logo",
+                             // "order_id": "order_9A33XWu170gUtm", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                              "handler": function (response){
+                                  alert(response.razorpay_payment_id);
+                                  $.ajax({
+                                        method:"POST",
+                                        url:"/place-order",
+                                        data:{
+                                          'fname':response.fname,
+                                          'lname':response.lname,
+                                          'email':response.email,
+                                          'phone':response.phone,
+                                          'address1':response.address1,
+                                          'address2':response.address2,
+                                          'city':response.city,
+                                          'state':response.state,
+                                          'country':response.country,
+                                          'payment_mode  ':"Paid by Razorpay",
+                                          'payment_id':response.razorpay_payment_id 
+                                        },
+                                        success:function(response)
+                                        {
+                                                                     
+                                        }
+                                    });
+                              },
+                              "prefill": {
+                                  "name": response.fname+' '+response.lname,
+                                  "email": response.email,
+                                  "contact": response.phone
+                              },
+                              "theme": {
+                                  "color": "#3399cc"
+                              }
+                          };
+                          var rzp1 = new Razorpay(options);
+
+                              rzp1.open();
+                          
+                    }
+                  
+
+
+
+    add in order migration:
+      $table->string('payment_mode')->default(null);
+      $table->string('payment_id')->default(null);
+
+
+    edit checkout.blade.php above place order button:
+         <input type="hidden" name="payment_mode" value="COD">
+
+    edit placeorder controller method:
+      add in input section:
+         $order->payment_mode=$request->input('payment_mode');
+         $order->payment_id=$request->input('payment_id');
+      
+
+
+    
+     
+35.Paypal added
+
+
+
+36.Product Rating:
+
+
+    php artisan make:model Rating -m
+
+   
+    model:
+       protected $table='ratings';
+       protected $fillable=['user_id','prod_id','stars_rated'];
+
+    migration:
+        $table->integer('user_id');
+        $table->integer('prod_id');
+        $table->integer('stars_rated');
+
+   migrate now;
+
+
+    php artisan make:controller Frontend/RatingController
+
+
+
+    web:
+     Route inside auth::get('/add-rating','Frontend/RatingController@add_rating');
+
+
+
+    view-product.blade.php:
+      add layout inside modal:
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url('/add-rating')}}" method="POST">
+            @csrf
+            <input type="hidden" name="product_id" value="{{$product->id}}">
+                  <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Rate {{$product->name}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body"> 
+
+
+                                     <div class="rating-css">
+                                          <div class="star-icon">
+                                                @if($user_rating)
+                                                      @for($i=1;$i<=$user_rating->stars_rated;$i++)
+                                                            <input type="radio" value="{{$i}}" name="product_rating" checked id="rating{{$i}}">
+                                                            <label for="rating{{$i}}" class="fa fa-star"></label>
+                                                      @endfor
+                                                      @for($j=$user_rating->stars_rated+1;$j<=5;$j++)
+                                                      <input type="radio" value="{{$j}}" name="product_rating" id="rating{{$j}}">
+                                                      <label for="rating{{$j}}" class="fa fa-star"></label>
+                                                      @endfor
+                                                @else
+                                                      <input type="radio" value="1" name="product_rating" id="rating1">
+                                                      <label for="rating1" class="fa fa-star"></label>
+                                                      <input type="radio" value="2" name="product_rating" id="rating2">
+                                                      <label for="rating2" class="fa fa-star"></label>
+                                                      <input type="radio" value="3" name="product_rating" id="rating3">
+                                                      <label for="rating3" class="fa fa-star"></label>
+                                                      <input type="radio" value="4" name="product_rating" id="rating4">
+                                                      <label for="rating4" class="fa fa-star"></label>
+                                                      <input type="radio" value="5" name="product_rating" id="rating5">
+                                                      <label for="rating5" class="fa fa-star"></label>
+                                                @endif
+
+
+                                          </div>
+                                    </div>
+                                    
+                                    
+
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+          </form>
+        </div>
+      </div>
+</div>
+
+
+      paste this below price:
+                              @php $ratenum=number_format($rating_value) @endphp
+                              <div class="rating">
+                                    @for($i=1;$i<=$ratenum;$i++)
+                                         <i class="fa fa-star checked"></i>
+                                    @endfor
+                                    @for($j=$ratenum+1;$j<=5;$j++)
+                                         <i class="fa fa-star"></i>
+                                    @endfor
+                                    
+                                    <span>
+                                        @if($rating->count()>0)  
+                                          {{$rating->count()}}  Ratings
+                                        @else
+                                          No Ratings
+                                        @endif  
+                                    </span>
+
+                              </div>
+
+
+     modal button:
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                          Rate this Product
+                                    </button>
+
+
+     add css code in custome.css:
+/* rating */
+.rating-css div {
+    color: #ffe400;
+    font-size: 30px;
+    font-family: sans-serif;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 20px 0;
+  }
+  .rating-css input {
+    display: none;
+  }
+  .rating-css input + label {
+    font-size: 60px;
+    text-shadow: 1px 1px 0 #8f8420;
+    cursor: pointer;
+  }
+  .rating-css input:checked + label ~ label {
+    color: #b4afaf;
+  }
+  .rating-css label:active {
+    transform: scale(0.8);
+    transition: 0.3s ease;
+       }  
+
+    .checked{
+          color:#ffd900;
+    }
+
+/* End of Star Rating */
+
+
+    link css code in frontend.blade.php
+
+
+      cont:
+    public function add_rating(Request $request)
+    {
+        $stars_rated=$request->input('product_rating');
+        $product_id=$request->input('product_id');
+
+        $product_check=Product::where('id',$product_id)->first();
+        if($product_check)
+        {
+              $verified_purchase=Order::where('orders.user_id',Auth::id())
+                                        ->join('order_items','orders.id','order_items.order_id')
+                                        ->where('order_items.prod_id',$product_id)->get();
+
+              if($verified_purchase->count()>0)
+              {
+                  $existing_rating=Rating::where('user_id',Auth::id())->where('prod_id',$product_id)->first();
+                  if($existing_rating)
+                  {
+                       $existing_rating->stars_rated=$stars_rated;
+                       $existing_rating->update();
+                  }
+                  else
+                  {
+                    Rating::create([
+                        'user_id'=>Auth::id(),
+                        'prod_id'=>$product_id,
+                        'stars_rated'=>$stars_rated,
+                    ]);
+                  }
+                  return redirect()->back()->with('status',"Thank you for Rating this product");
+                    
+              }   
+              else
+              {
+                  return redirect()->back()->with('status',"You can't rate this product without purchase");
+              }                       
+        }
+        else
+        {
+               return redirect()->back()->with('status',"The link you followed was broken");
+        }
+    }
+
+
+
+
+    updated view_product():
+    public function view_product($cate_slug,$prod_slug)
+    {
+        if(Category::where('slug',$cate_slug)->exists())
+        {
+            if(Product::where('slug',$prod_slug)->exists())
+            {
+                $product=Product::where('slug',$prod_slug)->first();
+                $rating=Rating::where('prod_id',$product->id)->get();
+                $rating_sum=Rating::where('prod_id',$product->id)->sum('stars_rated');
+                $user_rating=Rating::where('prod_id',$product->id)->where('user_id',Auth::id())->first();
+                if($rating->count()>0)
+                {
+                    $rating_value=$rating_sum/$rating->count();
+                }
+                else
+                {
+                    $rating_value=0;
+                }
+                
+                return view('frontend/view-product',['product'=>$product,'rating'=>$rating,'rating_value'=>$rating_value,'user_rating'=>$user_rating]);
+            }
+            else
+            {
+                return view('frontend/view-product')->with('status','No such product found');
+            }
+        }
+        else
+        {
+        return view('frontend/view-product')->with('status','No such Category found');
+        }
+    }
+
+
+    
+
+

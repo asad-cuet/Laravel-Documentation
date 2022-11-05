@@ -1,0 +1,142 @@
+***Installation:
+   1.composer require livewire/livewire
+
+***Component creation:
+   1.php artisan make:livewire Name
+
+   [it will create 2 files.
+    1 on app/http/livewire/Name.php   //class file
+    2nd on resource/views/livewire/name.blade.php   //blade file
+   ]
+
+   2.php artisan make:livewire Name --inline
+
+   [It will create only class file] //you can return here html code
+
+
+***Component Layout:
+
+1.Create resources/views/layouts/app.blade.php
+
+    app.blade.php:
+
+      <header>
+
+      @livewireStyles
+      </header>
+
+      <body>
+      {{$slot}}         //all component will show here
+      @livewireScripts  //at the end of body
+      </body>
+
+***How to route:
+use App\Http\Livewire\Name;
+
+   1.Route::get('/url',Name::class);
+
+***Include on other blade file;
+
+      <header>
+      @livewireStyles
+      </header>
+
+      <body>
+      @livewire('name')
+      @livewireScripts  //at the end of body
+      </body>
+
+***Pass variable:
+
+   On web.php:
+      Route::get('/url/{name}',Name::class);
+
+   On class file inside class:
+              public $name_;  //this var declaration
+              public function any($name)
+              {
+                 $this->name_=$name;
+              }
+
+   on blade.php:
+          Name:{{$name}}
+
+
+
+***Action:
+1:::
+
+   blade:
+
+   <button type="button" wire:click="funcName(1,2)">Sub</button>
+  
+   Sum={{$sum}}   sum will show here by value binding
+
+   class:    
+
+   public $sum;
+   
+   public function funcName($x,$y)
+   {
+        $this->sum=$x+$y;
+   }
+    
+
+2:::
+
+     blade:
+     <textarea wire:keydown.enter="displayMsg($event.target.value)"></textarea>
+
+     Message:{{$msg}}
+
+     class:
+
+     public $msg;
+
+     displayMsg($msg)
+     {
+        $this->msg=$msg;
+     }     
+
+
+
+***Form Submission:
+
+  blade:
+
+   <form wire.submit.prevent="getSum">  
+
+   <input type="text"  wire:model="num1" />  //value will pass by wire:model in public var $num1
+   <input type="text" wire:model="num2" />
+   <button type="submit">Submit</button>
+
+   </form>
+
+   Number 1={{$num1}}
+   Number 2={{$num2}}
+   Sum={{$sum}}
+
+   
+   class:
+
+   public $num1;
+   public $num2;
+   public $sum;
+ 
+   public function getSume()
+   {
+    $this->sum=$this->num1+$this->num2;
+   }
+
+
+=============================================
+============================================
+
+Undo Livewire:
+
+
+php artisan livewire:delete foo
+# Removes Foo.php & foo.blade.php
+ 
+php artisan livewire:delete foo --force
+# Removes without confirmation prompt

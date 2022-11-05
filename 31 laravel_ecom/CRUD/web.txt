@@ -1,0 +1,11 @@
+
+
+    Route::get('/categories','Admin\CategoryController@index')->name('category');
+    
+    Route::prefix('categories')->name('category.')->group(function(){
+         Route::get('insert_form','Admin\CategoryController@insert_form')->name('read'); 
+         Route::post('insert','Admin\CategoryController@insert')->name('insert'); 
+         Route::get('edit/{id}','Admin\CategoryController@edit')->name('edit'); 
+         Route::post('update/{id}','Admin\CategoryController@update')->name('update'); 
+         Route::get('delete/{id}','Admin\CategoryController@delete')->name('delete'); 
+                                      });

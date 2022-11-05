@@ -1,0 +1,19 @@
+1.Go to: www.ubunto.com/download/desktop
+
+    download
+
+
+2.Go to : rufus.ie
+
+   download portable
+
+
+3.Open rufus > connect empty pendrive > select pendrive > click select > select ubunto.iso > partition=MBR > click Start > click recommended>
+
+       > Go to power option > system setting > change setting(unavailable) > untick turn on fast >
+
+       shut down laptop > on laptop [type F2][know yur boot menu key before] > key any arraow button > Boot list option> 1st boot=USB 
+
+       > load legacy=enable > F10[save] > English > install ubunto > Englisg > Continue[connect wifi] > Noemal intallation | Install third party | Update version
+
+       > Important step 

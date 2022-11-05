@@ -1,0 +1,11 @@
+*rename:
+xampp/apache to apache old
+
+xampp/php to php old
+
+
+*Copy apache & php from new version xamp
+
+done!!!
+
+*if upgrading to xamp 7.4 also do php.php.ini >> replace 'xampp' tp 'D:/xampp'

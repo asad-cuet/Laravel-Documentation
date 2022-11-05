@@ -1,0 +1,57 @@
+php artisan tinker
+
+>>activity()->log('logging something')
+
+
+How to watch it:
+
+use Spatie\Activitylog\Models\Activity;
+
+public function index()
+{
+        $activity=Activity::all();
+        return $activity;
+
+}
+
+docs:https://spatie.be/docs/laravel-activitylog/v4/advanced-usage/logging-model-events
+
+How to use:
+
+Model.php:
+
+use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+
+class User extends Authenticatable
+{
+    use LogsActivity;
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    //Optional. This method will allow you to fill properties and add custom fields before the activity is saved.
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->log_name = "User {$eventName}";
+    }
+
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['name', 'email','password']);
+        // Chain fluent methods for configuration options
+    }
+
+
+
+
+}
+
+
+
+

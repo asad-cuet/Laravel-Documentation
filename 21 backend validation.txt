@@ -1,0 +1,54 @@
+Backend Validate:[controller:]
+
+
+***on livewire:
+
+public $name;
+$validateData=$this->validate([
+             'name'=>'required',
+             'email'=>'required|email',
+             'phone'=>'required|max:13|min:10',
+             'message'=>'required',
+             'filename'=>'required'
+                             ]);
+
+
+
+***on Http (request $req):
+
+$validateData=req>validate([
+             'name'=>'required',
+             'email'=>'required|email',
+             'phone'=>'required|max:13|min:10',
+             'message'=>'required',
+             'filename'=>'required'
+                             ]);
+
+
+
+***if variable:
+
+$name='asad';
+
+$validateData=validate([
+             'name'=>'required',
+             'email'=>'required|email',
+             'phone'=>'required|max:13|min:10',
+             'message'=>'required',
+             'filename'=>'required'
+                             ]);
+
+
+***DB::table('name')->insert($validateData);
+
+
+
+***Showing error on blade:
+
+
+@error('email')   //name,email,phone,message
+{{$message}}
+@enderror
+ 
+
+   

@@ -1,0 +1,146 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Student;
+use Illuminate\Support\Facades\File;
+
+use Illuminate\Http\Request;
+
+class StudentController extends Controller
+{
+
+    public function index()
+    {
+        $students=Student::all();
+        return view('students.index',['students'=>$students]);
+    }
+
+    public function add_student()
+    {
+        return view('students.add-student');
+    }
+
+
+    public function create(Request $request)
+    {
+        $student=new Student;
+        $student->Name=$request->name;
+        $student->Course=$request->course;
+
+         // enctype="multipart/form-data" 
+         //for name:getClientOriginalName(); 
+         // extension:getClientOriginalExtension()
+         //path:getRealPath(); 
+         //size:getSize()         
+
+         if($request->hasfile('image'))       
+        {
+            $file=$request->file('image');
+            $extention=$file->getClientOriginalExtension();  
+            $filename=time().'.'.$extention;
+            $file->move('uploads/students',$filename);  //move($destin,$name);
+            $student->Image=$filename;
+        }
+        $student->save();
+        return redirect()->back()->with('status','Student Added!!');
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $student=Student::find($id);
+        $student->Name=$request->name;
+        $student->Course=$request->course;
+
+        if($request->hasfile('image'))
+        {
+            $old_image='uploads/students/'.$student->Image;
+            if(File::exists($old_image))
+            {
+                File::delete($old_image);
+            }
+
+            $file=$request->file('image');
+            $extention=$file->getClientOriginalExtension();
+            $filename=time().'.'.$extention;
+            $file->move('uploads/students',$filename);
+            $student->Image=$filename;
+        }
+        $student->save();
+        return redirect(route('index'))->with('status','Student Updated!!');
+    }
+
+
+    public function edit_read($id)
+    {
+        $student=Student::find($id);
+        return view('students.edit-student',['student'=>$student]);
+
+    }
+
+    public function destroy($id)
+    {
+        $student=Student::find($id);
+        $old_image='uploads/students/'.$student->Image;
+        if(File::exists($old_image))
+        {
+            File::delete($old_image);
+        }
+        $student->delete();
+        return redirect(route('index'))->with('status','Student Deleted!!');
+    }
+   
+
+
+
+
+
+
+   
+
+}
+/*
+
+Route::get('/',[StudentController::class,'index'])->name('index');
+Route::get('/add-student',[StudentController::class,'add_student'])->name('add_student');
+Route::post('/add-student',[StudentController::class,'create'])->name('create');
+Route::get('/edit-student/{id}',[StudentController::class,'edit_read'])->name('edit_read');
+Route::put('/edit-student/{id}',[StudentController::class,'update'])->name('update');
+Route::get('/delete-student/{id}',[StudentController::class,'destroy'])->name('destroy');
+
+
+*/
+
+
+Image update with extension:
+
+          if($request->hasfile('logo'))       
+          {
+
+               
+               $file=$request->file('logo');
+               $extention=$file->getClientOriginalExtension();  
+               if(array_search($extention,['jpg','png','jprg','gif']))
+               {
+                    $filename=time().'.'.$extention;
+                    $file->move('assets/admin/uploaded_logo',$filename);  
+                    $input_data['logo']=$filename;
+                    if($file)
+                    {
+                         $old_logo=CompanyInfo::where('id',1)->first()->logo;
+                         $old_image='assets/admin/uploaded_logo/'.$old_logo;
+                         if(File::exists($old_image))
+                         {
+                              File::delete($old_image);
+                         }
+                    }
+
+               }
+               else
+               {
+                    return back()->with('status', $extention.' file is not allowed');
+               }
+               
+          }
+

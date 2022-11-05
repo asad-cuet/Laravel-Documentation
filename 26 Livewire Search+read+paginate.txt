@@ -1,0 +1,50 @@
+***blade:
+
+
+<input type="text" placeholder="Search..." wire:model="searchTerm" />
+
+
+
+
+***class:
+
+
+public $searchTerm;
+public $datas;
+
+public function render()
+{
+
+   $searchTerm='%'.$this->searchTerm.'%';
+   $this->datas=Model::where('col','LIKE','$searchTerm')
+                 ->orWhere('col2','LIKE','$searchTerm')
+                 ->orWhere('col2','LIKE','$searchTerm')
+                 ->orWhere('col2','LIKE','$searchTerm')
+                 ->orderBy('id','DESC')->get();
+
+}
+
+//if nothing searched,it will show all
+
+
+
+***class:  //with pagination
+use Livewire\WithPagination;
+
+public $searchTerm;
+public $datas;
+use WithPagination;
+
+public function render()
+{
+
+   $searchTerm='%'.$this->searchTerm.'%';
+   $this->datas=Model::where('col','LIKE','$searchTerm')
+                 ->orWhere('col2','LIKE','$searchTerm')
+                 ->orWhere('col2','LIKE','$searchTerm')
+                 ->orWhere('col2','LIKE','$searchTerm')
+                 ->orderBy('id','DESC')->paginate(5);
+
+}
+
+blade: {{$datas->links()}}

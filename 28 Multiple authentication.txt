@@ -1,0 +1,301 @@
+Supprted version:
+Version	Laravel Version
+1.x	5.8, 6.x
+2.x	7.x
+3.x	8.x
+4.x	9.x
+
+1.Project create:
+
+    laravel new project-name 
+
+
+2.Connect Database.
+
+3.login peckage installation:[user authentication]
+
+   composer require laravel/ui   // or: composer require laravel/ui:^3.2.0
+
+   php artisan ui bootstrap --auth     // if vue: php artisan ui vue --auth // if react: php artisan ui react --auth // if without auth: rn without '--auth'
+
+   npm install && npm run dev  //run twice.if error,run again
+
+   php artisan migrate
+
+//file maked:migration, 'Auth' controller,
+             
+             'auth' blade folder, 'layout/deshboard.blade.php' folder,
+
+              ,A route on web.php
+
+Note:Half Done!You can register and login now
+
+4.Run again: [admin authentication]
+
+***(a)
+
+   php artisan make:model Admin -m
+
+//Admin migration:
+
+  copy all column from user migration
+
+//Admin model:
+
+  copy all from User model[rename Admin]
+
+  php artisan migrate
+
+***(b)
+
+  php artisan make:controller Admin/AdminController 
+  php artisan make:controller Admin/DasboardController
+
+***(c) 
+ create resource/views/backend folder
+ create resource/views/backend/admin/admin_login.blade.php folder  
+ create resource/views/backend/dashboard/admin_dashboard.blade.php  folder
+
+
+admin.blade.php:
+
+<form action="{{route('admin.login')}}" class="mt-5" method="POST">
+@csrf
+
+<div class="from-group">
+    <label for="">Email</label>
+    <input type="email" class="form-control" name="email" />
+</div>
+
+<div class="from-group">
+    <label for="">Password</label>
+    <input type="password" class="form-control" name="password" />
+</div>
+
+<div class="from-group">
+    <input type="submit" value="Admin Login" class="btn btn-success mt-3" />
+</div>
+
+</form>
+
+@if(Session::has('status'))
+{{Session::get('status')}}
+@endif
+
+
+admin_dashboard.blade.php:
+
+<h1>Admin Dashboard</h1>
+
+
+***(d)
+
+web.php:
+
+//admin route,include controller
+
+Route::get('/admin/login',[AdminController::class,'adminLoginForm'])->name('admin.login.form');
+Route::get('/admin/dashboard',[DashboardController::class,'adminDashboard'])->name('admin.dashboard');
+
+
+***(e)
+
+AdminController.php:
+
+adminLoginForm() 
+{
+   return view('backend.admin.admin_login');
+}
+
+
+
+
+
+
+DashboardController.php:
+
+adminDashboard() 
+{
+   return view('backend.dashboard.admin_dashboard');
+}
+
+
+
+  
+6.Admin Dashboard Gaurd.
+
+
+***(a)
+
+Models/Admin.php:
+
+   copy 'use Illuminate...\User as Authenticatable' from user model
+ 
+  edit:class Admin extends Authenticatable
+
+  {
+
+      protected $fillable=['name','email','password'];
+      protected $hidden=['password','remember_token'];
+
+  }
+
+***(b)  starts from here
+
+config/auth.php:
+
+         //add inside guards
+
+           'admin'=>[
+                  'driver'=>'session',
+                  'provider'=>'admins',
+                    ],
+
+         //add inside providers
+
+           'admins'=>[
+                  'driver'=>'eloquent',
+                  'provider'=>app\Models\Admin::class,
+                    ],
+
+***(c)
+
+   run:php artisan make:middleware Admin  
+
+   //register app/http/kernel.php in $routeMiddleware
+
+   'admin'=>\App\Http\Middleware\Admin::class,   //Admin:: is middleware name
+
+***(d)
+
+app/http/middleware/Admin.php:
+
+use Auth;
+
+     //add in handle()
+
+     if(!Auth::guard('admin')->check())
+     {
+        return redirect('/admin/login');  //if not loggeed in
+      }
+
+
+
+***(e):
+
+//edit web.php:
+
+   Route::group(['middleware'=>'admin'],function(){
+             Route::get('admin/dashboard',[DashboardController::class,'adminDashboard'])->name('admin.dashboard');
+                });
+Note:
+Done! You cannot access admin dashboard without login
+workflow:web->kernel->middleware->auth   ||   you can create session from controller at auth
+  
+   
+
+7.
+
+add in web.php:
+
+    Route::post('/admin/login/pro',[AdminController::class,'adminLogin'])->name('admin.login');
+
+AdminController.php:
+
+use Session;
+use Auth;
+
+     adminLogin(Request $req)
+     {
+      $req->validate([
+            'email'=>'required|email',
+            'password'=>'required'
+                      ]);
+
+     if(Auth::guard('admin')->attempt(['email'=>$req->email,'password'=>$req->password]))   //craete session in auth.php
+     {
+      return redirect('/admin/ashboard');
+     }
+     else
+     {
+     Session::flash('status','Invalid Email or Password');
+     return back();
+     }
+
+8.Admin Logout
+
+web.php:
+
+   // add in group
+    Route::get('admin/logout',[AdminController::class,'adminLogout'])->name('admin.logout');
+
+
+AdminController.php:
+
+    adminLogout()
+    {
+         Auth::guard('admin')->logout();
+         return redirect('admin/login');
+    }
+
+admin_dashboard.blade.php:
+
+
+   /add 
+   <h3 class="text-center">
+      <a href="{{url('admin/logout')}}">Logout</a>
+   </h3>
+
+                
+
+9.Admin Login guard:
+
+run:php artisan make:middleware AdminLoginGuard
+
+
+miidleware/AdminLoginGuard.php:
+use Auth; 
+
+         if(Auth::guard('admin')->check())
+        {
+           return redirect('/admin/dashboard');  //if  loggeed in
+        }
+kernel.php:
+
+   // add insinde $routemiddleware:
+
+    'adminLoginGuard'=>\App\Http\Middleware\AdminLoginGuard::class,
+
+
+web.php:
+     //edit
+
+Route::group(['middleware'=>'adminLoginGuard'],function(){
+    Route::get('/admin/login',[AdminController::class,'adminLoginForm'])->name('admin.login.form');
+                                               });
+
+
+Note:All done!
+
+
+
+//Custom authentication:
+
+Auth::routes([
+    'register' => false, // Registration Routes is off now...
+    'reset' => false, // Password Reset Routes...
+    'verify' => false, // Email Verification Routes...
+  ]);
+// Auth::routes();
+
+
+
+
+
+
+
+
+
+
+   
+   

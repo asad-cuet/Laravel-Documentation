@@ -1,0 +1,28 @@
+***Install package:composer require barryvdh/laravel-dompdf
+
+***Set the package:config/app.php:
+
+   inside provider array:
+
+         Barryvdh\DomPDF\ServiceProvider::class,
+
+
+   inside aliases array:
+
+         'PDF'=>\Barryvdh\DomPDF\Facade::class,
+
+***artisan:php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"
+
+***Read data from table and print in a blade page with pdf design  [pdf.blade.php]
+
+***Controller.php:
+ use PDF;
+   method(){
+
+        $data=Model::all();
+        $pdf=PDF::loadView('pdf',['data'=>$data])->setOptions(['defaultFont' => 'sans-serif']);
+        return $pdf->download('set-name.pdf');
+
+         }
+
+***execute the method

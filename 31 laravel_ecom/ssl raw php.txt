@@ -1,0 +1,74 @@
+1.website:developer.sslcommerz.com
+
+  see here documentation:https://developer.sslcommerz.com/doc/v4/
+
+
+2.register.
+
+3.You got a email and details
+
+   Merchant Panel:https://sandbox.sslcommerz.com/manage/
+   login using inputed email:asadul7733@gmail.com,password:your common Asad
+
+
+4.changing url of localhost:
+
+      open notePad as administration
+      file > open > Drive C > Windows >
+      system 32 > drivers > etc > (all files)
+      hosts.
+
+
+
+5.edit hosts:
+
+        replace: 127.0.0.1 www.e-shop.com
+  
+        now this url redirect to xamp dashboard
+
+6.live integration:https://securepay.sslcommerz.com
+  sandbox integration:https://sandbox.sslcommerz.com
+
+
+7.integrate:
+    
+        Go to documentation > 
+   
+        php> copy the code (initiate+request)
+
+        craete a button:       [we neewd total price.other get from user session]
+
+        create a web:
+  
+        make controller: 
+ 
+                     paste php code
+
+                     store id & password: given in email
+
+                     set total price & other parameter
+
+                     set success url  [redirect to my-orders]
+
+                     replace $direct_api_url=...v4 to v3
+
+                     you can see now payment gateway
+
+
+8.go to the sandbox account
+
+         my store > ipn setting > set IPN Http listener: paste success url
+
+
+9. copy 2nd php code:
+
+              paste on success page  [where will redirect after payment]
+
+              set store id & password
+
+              remove error space (if)
+
+ 
+
+             
+

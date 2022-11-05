@@ -1,0 +1,51 @@
+    <!-- Modal -->
+    <div wire:ignore.self class="modal fade" id="create" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Create New Row</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="color:black">
+
+           <form enctype="multipart/form-data" id="create_from">
+            <div class="mb-3 row">
+                  <label for="staticEmail" class="col-sm-2 col-form-label">Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="staticEmail" wire:model="name">@error('name') <span class="text-danger">{{$message}}</span>@enderror
+                  </div>
+            </div>
+            <div class="mb-3 row">
+                  <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="staticEmail" wire:model="email">@error('email') <span class="text-danger">{{$message}}</span>@enderror
+                  </div>
+            </div>
+            <div class="mb-3 row">
+                  <label for="staticEmail" class="col-sm-2 col-form-label">Phone</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="staticEmail" wire:model="phone">@error('phone') <span class="text-danger">{{$message}}</span>@enderror
+                  </div>
+            </div>
+            <div class="mb-3 row">
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Message</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" id="inputPassword"  wire:model="message"></textarea>@error('message') <span class="text-danger">{{$message}}</span>@enderror
+                  </div>
+            </div>
+            <div class="mb-3 row">
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Image</label>
+                  <div class="col-sm-10">
+                    <input type="file" class="form-control" id="inputPassword"  wire:model="filename" />@error('filename') <span class="text-danger">{{$message}}</span>@enderror
+                  </div>
+            </div>
+
+      </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" wire:click.prevent="create()">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
