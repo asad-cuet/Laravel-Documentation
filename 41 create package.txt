@@ -1,0 +1,357 @@
+About this package:
+==================
+
+        If someone installs this in their Laravel project, 
+        they'll receive a random inspirational quote upon visiting the /inspire route. 
+        You'll get the quotes from the https://api.goprogram.ai/inspiration/ API.
+
+
+The name of a package usually consists of two parts: 
+===================================================
+1. the vendor name and 
+
+2. the package name
+
+Example: laravel/framework  [laravel is the vendor and framework is the package name]
+-------
+
+[Suggest: name my packages following the <my-github-username>/<package-name> format]
+
+
+Directories:
+============
+
+Execute on project root: mkdir -p packages/fhsinchy/inspire/src
+
+[The src directory will hold all the PHP codes]
+
+
+Steps:
+  
+1.Initializing a New Package:
+----------------------------
+        cd into the packages/fhsinchy/inspire directory
+
+        run: composer init      
+
+        [write the package name, description, and author information properly]           
+
+2.Vendor:
+---------
+
+        [Once the package has been initialized,
+        you'll find a new vendor directory and composer.
+        json file inside the inspire directory. Open the composer.
+        json file (keep in mind, this composer.
+        json file is separate from your project composer.json file)]   
+
+
+
+        update the require {} section as follows:
+
+                "require": {
+                    "guzzlehttp/guzzle": "^7.0.1"
+                }   
+
+3.The final state of the composer.json file:
+--------------------------------------------
+        {
+            "name": "fhsinchy/inspire",
+            "autoload": {
+                "psr-4": {
+                    "Fhsinchy\\Inspire\\": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Farhan Hasin Chowdhury",
+                    "email": "shovik.is.here@gmail.com"
+                }
+            ],
+            "require": {
+                "guzzlehttp/guzzle": "^7.0.1"
+            }
+        }
+
+
+4.Create a new file Inspire.php inside the src directory and put the following code:
+-----------------------------------------------------------------------------------
+
+        <?php
+
+        namespace Fhsinchy\Inspire;
+
+        use Illuminate\Support\Facades\Http;
+
+        class Inspire {
+            public function justDoIt() {
+                $response = Http::get('https://inspiration.goprogram.ai/');
+
+                return $response['quote'] . ' -' . $response['author'];
+            }
+        }
+
+
+        [   justDoIt response:{"quote": "The greatest discovery of all time is that a person can change their future by merely changing their attitude.", 
+            "author": "Oprah Winfrey"}  ]
+
+
+5open the composer.json file on your project root:
+
+
+        "autoload": {
+            "psr-4": {
+                "App\\": "app/",
+                "Database\\Factories\\": "database/factories/",
+                "Database\\Seeders\\": "database/seeders/",
+                "Fhsinchy\\Inspire\\": "packages/fhsinchy/inspire/src/"   // add this ****
+            }
+        },
+
+
+5.run:  composer dump-autoload
+------------------------------
+
+
+6.Testing:
+-----------
+    web.php:
+
+        Route::get('inspire', function(Fhsinchy\Inspire\Inspire $inspire) {
+            return $inspire->justDoIt();
+        });
+
+
+
+7.reate a new file src/Providers/InspirationProvider.php and put the following code in it:  
+------------------------------------------------------------------------------------------
+
+        [work as sort of the entry point]
+
+
+        <?php
+
+        namespace Fhsinchy\Inspire\Providers;
+
+        use Illuminate\Support\ServiceProvider;
+
+        class InspirationProvider extends ServiceProvider
+        {
+            /**
+            * Bootstrap services.
+            *
+            * @return void
+            */
+            public function boot()
+            {
+                //
+            }
+        }
+
+
+
+8. Open the config/app.php file:
+--------------------------------
+        PROVIDERS ARRAY:
+
+        /*
+            * Package Service Providers...
+        */
+        Fhsinchy\Inspire\Providers\InspirationProvider::class,	
+
+
+
+
+
+
+9.package call at controller:
+----------------------------
+
+        <?php
+        namespace Fhsinchy\Inspire\Controllers;
+
+        use Illuminate\Http\Request;
+        use Fhsinchy\Inspire\Inspire;
+
+        class InspirationController
+        {
+            public function __invoke(Inspire $inspire) {
+                $quote = $inspire->justDoIt();
+
+                return $quote';
+            }
+        }
+
+
+10.Package call at web:
+-----------------------
+
+        <?php
+
+        use Fhsinchy\Inspire\Controllers;
+        use Illuminate\Support\Facades\Route;
+
+        Route::get('inspire', InspirationController::class);
+
+
+
+11.Update src/Providers/InspirationProvider.php:
+------------------------------------------------
+
+        <?php
+        namespace Fhsinchy\Inspire\Providers;
+
+        use Illuminate\Support\ServiceProvider;
+
+        class InspirationProvider extends ServiceProvider
+        {
+            /**
+            * Bootstrap services.
+            *
+            * @return void
+            */
+            public function boot()                                    //*************
+            {
+                $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+            }
+        }
+
+
+
+12.Adding Views to Package:
+---------------------------
+
+       src/views/index.blade.php
+
+
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <title>Inspire</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        </head>
+
+        <body>
+            <div class="container">
+                <h1>{{ $quote }}</h1>
+            </div>
+        </body>
+        </html>
+
+
+
+13.Update src/Providers/InspirationProvider.php
+------------------------------------------------
+
+        public function boot()
+        {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+            $this->loadViewsFrom(__DIR__.'/../views', 'inspire');    directory where you’ve kept your views
+        }
+
+
+14.update src/Controllers/InspirationController.php:
+----------------------------------------------------
+
+        <?php
+        namespace Fhsinchy\Inspire\Controllers;
+
+        use Illuminate\Http\Request;
+        use Fhsinchy\Inspire\Inspire;
+
+        class InspirationController
+        {
+            public function __invoke(Inspire $inspire) {
+                $quote = $inspire->justDoIt();
+
+                return view('inspire::index', compact('quote'));     //first one is the directory where you’ve kept your views
+            }
+        }
+
+
+
+Sharing Your Package With Others:
+====================================
+
+
+15.cd into the packages/fhsinchy/inspire:
+-------------------------------------------- 
+        xecute the following set of commands:
+
+        echo "/vendor/" > .gitignore
+        git init
+        git checkout -b master
+        git add .
+        git commit -m "Initial commit"
+        git tag 1.0.0
+
+
+
+        push to a new repository:
+
+        git remote add origin git@github.com:fhsinchy/inspire.git
+        git push -u origin --all
+        git push -u origin --tags
+
+
+
+
+
+Initialing package in new project
+=================================
+
+
+1.composer require fhsinchy/inspire
+-----------------------------------
+
+
+
+2.config/app.php:
+-----------------
+        /*
+        * Package Service Providers...
+        */
+        Fhsinchy\Inspire\Providers\InspirationProvider::class,
+
+
+
+
+Note:
+        you can use the Fhsinchy\Inspire\Inspire.php class anywhere in the project
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             

@@ -1,0 +1,5 @@
+1.laravel api resource
+
+2.Table relation
+
+3.foregn key,peimary key

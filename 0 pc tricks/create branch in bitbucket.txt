@@ -1,0 +1,11 @@
+***creating:
+1.$ git branch feature_branch     
+
+***Switch to the feature branch to work on it:
+
+2.$ git checkout feature_branch
+
+
+***If you want to get back main branch:
+
+run: git checkout main      
