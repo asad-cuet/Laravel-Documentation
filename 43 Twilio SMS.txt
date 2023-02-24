@@ -1,0 +1,38 @@
+1. run: composer require twilio/sdk
+
+2. 3 things need: sid, token, from_number (provided by twilio account)
+
+2.method():
+
+	$to_phone='';
+	s$message='';
+
+ 	$sid=$sms_setting->sid;
+        $token=$sms_setting->token;
+        $from_phone=$sms_setting->from;
+
+        try
+        {
+            
+            $client=new Client($sid,$token);
+            $client->message->create($to_phone,
+            [
+                'from'=>$from_phone,
+                'body'=>$message
+            ]
+            );
+            $data = [
+                'success' => true,
+                'message' => "SMS Successfully Sent"
+            ];
+            
+        }
+        catch(Exception $error)
+        {
+            $data = [
+                'success' => false,
+                'message' => "Error: ".$error->getMessage()
+            ];
+        }
+
+	return $data;
