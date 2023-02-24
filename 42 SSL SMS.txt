@@ -1,0 +1,43 @@
+1.install:
+==========
+composer require sslwireless/sslwireless-sms
+
+2.Controller Method Example:
+===========================
+<?php
+
+use SslWireless\SslWirelessSms; // Use the installed package
+
+class SomeController extends Controller
+{
+    public function someFunction()
+    {
+        // username, password, sid provided by sslwireless
+        $SslWirelessSms = new SslWirelessSms('username','password', 'sid');
+        // You can change the api url if needed. i.e.
+        // $SslWirelessSms->setUrl('new_url');
+        $output = $SslWirelessSms->send('123456789','This is a test message.');
+
+        dd($output);
+    }
+}
+
+?>
+
+
+
+
+3. Output:
+===========
+Output
+The output will always be in JSON format.
+
+{
+  "status": "success", // or "failed"
+  "result": "sms sent", // or "invalid mobile or text" or "invalid mobile" or "invalid credentials"
+  "phone": "123456789", // number to send message
+  "message": "This is a test message.", // message sent
+  "reference_no": "randomly_generated_unique_no", // client generated reference no
+  "ssl_reference_no": "returned_sslwirless_reference_no", // api generated reference no
+  "datetime": "2018-02-07 01:35AM" // datetime of process
+}

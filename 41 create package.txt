@@ -21,27 +21,32 @@ Example: laravel/framework  [laravel is the vendor and framework is the package 
 Directories:
 ============
 
-Execute on project root: mkdir -p packages/fhsinchy/inspire/src
+Execute on project root: 
 
-[The src directory will hold all the PHP codes]
+        mkdir -p packages/asad-cuet/inspire/src
+
+        [The src directory will hold all the PHP codes]
 
 
 Steps:
   
 1.Initializing a New Package:
 ----------------------------
-        cd into the packages/fhsinchy/inspire directory
+        cd into the packages/asad-cuet/inspire directory
 
         run: composer init      
 
-        [write the package name, description, and author information properly]           
+        [write the package name, description, and author information properly]    
+
+        [set all default value. if askto add your dependencies and dev-depdendencies interactively or not, write n+hit enter]       
 
 2.Vendor:
 ---------
 
         [Once the package has been initialized,
         you'll find a new vendor directory and composer.
-        json file inside the inspire directory. Open the composer.
+        json file inside the inspire directory. 
+        Open the composer.
         json file (keep in mind, this composer.
         json file is separate from your project composer.json file)]   
 
@@ -56,10 +61,10 @@ Steps:
 3.The final state of the composer.json file:
 --------------------------------------------
         {
-            "name": "fhsinchy/inspire",
+            "name": "asad-cuet/inspire",
             "autoload": {
                 "psr-4": {
-                    "Fhsinchy\\Inspire\\": "src/"
+                    "AsadCuet\\Inspire\\": "src/"
                 }
             },
             "authors": [
@@ -79,7 +84,7 @@ Steps:
 
         <?php
 
-        namespace Fhsinchy\Inspire;
+        namespace AsadCuet\Inspire;
 
         use Illuminate\Support\Facades\Http;
 
@@ -104,7 +109,7 @@ Steps:
                 "App\\": "app/",
                 "Database\\Factories\\": "database/factories/",
                 "Database\\Seeders\\": "database/seeders/",
-                "Fhsinchy\\Inspire\\": "packages/fhsinchy/inspire/src/"   // add this ****
+                "AsadCuet\\Inspire\\": "packages/asad-cuet/inspire/src/"   // add this ****
             }
         },
 
@@ -123,7 +128,7 @@ Steps:
 
 
 
-7.reate a new file src/Providers/InspirationProvider.php and put the following code in it:  
+7.create a new file packages/asad-cuet/inspire/src/Providers/InspirationProvider.php and put the following code in it:  
 ------------------------------------------------------------------------------------------
 
         [work as sort of the entry point]
@@ -131,7 +136,7 @@ Steps:
 
         <?php
 
-        namespace Fhsinchy\Inspire\Providers;
+        namespace AsadCuet\Inspire\Providers;
 
         use Illuminate\Support\ServiceProvider;
 
@@ -157,21 +162,22 @@ Steps:
         /*
             * Package Service Providers...
         */
-        Fhsinchy\Inspire\Providers\InspirationProvider::class,	
+        AsadCuet\Inspire\Providers\InspirationProvider::class,	
 
 
 
 
 
 
-9.package call at controller:
+9.package's controller:
 ----------------------------
+        [Create a new file packages/asad-cuet/inspire/src/Controllers/InspirationController.php with the following code:]
 
         <?php
-        namespace Fhsinchy\Inspire\Controllers;
+        namespace AsadCuet\Inspire\Controllers;
 
         use Illuminate\Http\Request;
-        use Fhsinchy\Inspire\Inspire;
+        use AsadCuet\Inspire\Inspire;
 
         class InspirationController
         {
@@ -183,15 +189,16 @@ Steps:
         }
 
 
-10.Package call at web:
+10.Package's web:
 -----------------------
+        [create a new file packages/asad-cuet/inspire/src/routes/web.php and put the following code in it]
 
         <?php
 
-        use Fhsinchy\Inspire\Controllers;
+        use AsadCuet\Inspire\Controllers;
         use Illuminate\Support\Facades\Route;
 
-        Route::get('inspire', InspirationController::class);
+        Route::get('inspire', AsadCuet\Inspire\Controllers\InspirationController::class);
 
 
 
@@ -199,7 +206,7 @@ Steps:
 ------------------------------------------------
 
         <?php
-        namespace Fhsinchy\Inspire\Providers;
+        namespace AsadCuet\Inspire\Providers;
 
         use Illuminate\Support\ServiceProvider;
 
@@ -210,9 +217,9 @@ Steps:
             *
             * @return void
             */
-            public function boot()                                    //*************
+            public function boot()                                    
             {
-                $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+                $this->loadRoutesFrom(__DIR__.'/../routes/web.php');   //*************
             }
         }
 
@@ -250,7 +257,7 @@ Steps:
         public function boot()
         {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-            $this->loadViewsFrom(__DIR__.'/../views', 'inspire');    directory where you’ve kept your views
+            $this->loadViewsFrom(__DIR__.'/../views', 'inspire');   //***   directory where you’ve kept your views
         }
 
 
@@ -258,17 +265,17 @@ Steps:
 ----------------------------------------------------
 
         <?php
-        namespace Fhsinchy\Inspire\Controllers;
+        namespace AsadCuet\Inspire\Controllers;
 
         use Illuminate\Http\Request;
-        use Fhsinchy\Inspire\Inspire;
+        use AsadCuet\Inspire\Inspire;
 
         class InspirationController
         {
             public function __invoke(Inspire $inspire) {
                 $quote = $inspire->justDoIt();
 
-                return view('inspire::index', compact('quote'));     //first one is the directory where you’ve kept your views
+                return view('inspire::index', compact('quote'));    //***   //first one is the directory where you’ve kept your views
             }
         }
 
@@ -278,7 +285,7 @@ Sharing Your Package With Others:
 ====================================
 
 
-15.cd into the packages/fhsinchy/inspire:
+15.cd into the packages/asad-cuet/inspire:
 -------------------------------------------- 
         xecute the following set of commands:
 
@@ -293,7 +300,7 @@ Sharing Your Package With Others:
 
         push to a new repository:
 
-        git remote add origin git@github.com:fhsinchy/inspire.git
+        git remote add origin git@github.com:fhsinchy/inspire.git  //create a reporitory named 'inspire'
         git push -u origin --all
         git push -u origin --tags
 
@@ -305,7 +312,7 @@ Initialing package in new project
 =================================
 
 
-1.composer require fhsinchy/inspire
+1.composer require asad-cuet/inspire
 -----------------------------------
 
 
@@ -315,13 +322,13 @@ Initialing package in new project
         /*
         * Package Service Providers...
         */
-        Fhsinchy\Inspire\Providers\InspirationProvider::class,
+        AsadCuet\Inspire\Providers\InspirationProvider::class,
 
 
 
 
 Note:
-        you can use the Fhsinchy\Inspire\Inspire.php class anywhere in the project
+        you can use the AsadCuet\Inspire\Inspire.php class anywhere in the project
 
 
 
