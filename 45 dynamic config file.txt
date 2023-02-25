@@ -1,0 +1,10 @@
+$paypal_setting=PaypalSetting::where('id',1)->first();
+
+        //over writing config/paypal.php
+        Config::set('paypal.mode', $paypal_setting->mode );      //paypal is file name
+
+        Config::set('paypal.sandbox.client_id', $paypal_setting->client_id );
+        Config::set('paypal.sandbox.client_secret', $paypal_setting->secret );
+        
+        Config::set('paypal.live.client_id', $paypal_setting->client_id );
+        Config::set('paypal.live.client_secret', $paypal_setting->secret );
