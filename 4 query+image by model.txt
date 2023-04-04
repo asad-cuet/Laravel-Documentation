@@ -144,3 +144,30 @@ Image update with extension:
                
           }
 
+As a function:
+function uploadImage($file,$folder)
+{
+
+         $extension=$file->extension();
+         if(array_search($extension,['example','jpg','png','jprg','gif']))
+         {
+              $filename=uniqid().'.'.$extension;
+              $uploaded=$file->move($folder,$filename);  
+              $filepath=$folder.'/'.$filename;
+              if($uploaded)
+              {
+                return $filepath;
+              }
+              else
+              {
+                return false;
+              }
+              
+         }
+         else
+         {
+              return false;
+         }
+
+}
+
