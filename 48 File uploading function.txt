@@ -1,0 +1,119 @@
+function isImage($file)
+{
+    $extention=$file->getClientOriginalExtension();  
+    if(in_array($extention,['jpg','png','jpeg','gif']))
+    {
+        return $extention;
+    }
+    else
+    {
+        return False;
+    }
+}
+
+function isPdf($file)
+{
+    $extention=$file->getClientOriginalExtension();  
+    if(in_array($extention,['pdf']))
+    {
+        return True;
+    }
+    else
+    {
+        return False;
+    }
+}
+
+function isAllowedFile($file)
+{
+    $extention=$file->getClientOriginalExtension();  
+    if(in_array($extention,['pdf','xlsx','csv','file']))
+    {
+        return $extention;
+    }
+    else
+    {
+        return False;
+    }
+}
+
+function uploadFile($file,$path)
+{
+    $extention=$file->getClientOriginalExtension();  
+    $filename=uniqid().'.'.$extention;
+    if($file->move($path,$filename))
+    {
+        $filename=$path.'/'.$filename;
+        return $filename;
+    }
+    else
+    {
+        return false;
+    }
+
+
+}
+
+function deleteFile($filename)
+{
+    if(File::exists($filename))
+    {
+        File::delete($filename);
+    }
+}
+
+
+
+Combination at store:
+=====================
+
+            $image_key='image';
+            $image_path='assets/admin/uploads';
+            if($request->hasfile($image_key))       
+            {
+                 $file=$request->file($image_key);
+                 if(isImage($file))
+                 {
+                      $path=$image_path;
+                      $file_name=uploadFile($file,$path);
+                      if($file_name)
+                      {
+                        $row[$image_key]=$file_name;
+                      }
+                      else
+                      {
+                        return back()->with('fail','File Uploading Failed');
+                      }
+                 }
+                 else
+                 {
+                      return back()->with('fail','Uploaded file extension is not allowed');
+                 }
+            }
+
+
+Combination at update:
+=====================
+
+          if($request->hasfile('logo'))       
+          {
+               $file=$request->file('logo');
+               if(isImage($file))
+               {
+                    $path='assets/admin/images';
+                    $logo=uploadFile($file,$path);
+                    if($logo)
+                    {
+                         $old_logo=Setting::where('key','logo')->first()->value;
+                         deleteFile($old_logo);  
+                         $setting=Setting::where('key','logo')->first();  
+                         $setting->value=$logo;
+                         $setting->save();
+                    }
+               }
+               else
+               {
+                    return back()->with('status','Uploaded file extension is not allowed');
+               }
+               
+          }

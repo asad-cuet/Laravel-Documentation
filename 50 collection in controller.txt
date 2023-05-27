@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Product;
+use Illuminate\Support\Collection;
+use Illuminate\Http\Request;
+
+class CollectionController extends Controller
+{
+    public function index()
+    {
+        $table_data=Product::all();  //it's a array of object
+
+        //return keys
+        $data=collect($table_data)->keys();
+        //or
+        $data=collect($table_data)->map(function($item,$key)
+        {
+            return $key;
+        });
+
+
+        //return by indexing
+        $data=collect($table_data[3]);
+
+        //return a column
+        $data=collect($table_data)->map(function($item,$key)
+        {
+            return $item['name'];
+        });
+
+        //return some column in a objects's array
+        $data=collect($table_data)->map(function($item,$key)
+        {
+            return ['modified_name'=>$item['name'],'id'=>$item['id']];
+        });
+
+
+        //return as query
+        $data=collect($table_data)->map(function($item,$key)
+        {
+            $discount=($item['original_price']-$item['selling_price']) / $item['original_price'] *100;
+            
+            $discount=round($discount);
+
+            return ['name'=>$item['name'],'id'=>$item['id'],'discount'=>$discount];
+        });
+
+
+        return view('home',['datas'=>$data]);
+    }
+}

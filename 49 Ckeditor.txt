@@ -1,0 +1,98 @@
+CDN and Script:
+===============
+
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+
+<script>
+    
+    ClassicEditor
+        .create( document.querySelector( '#short_description' ) ,{
+            ckfinder: {
+                uploadUrl: "{{route('admin.ckeditor.upload')."?_token=".csrf_token()}}"   //for image upload
+            }
+        })
+        .then(editor=>{
+            console.log(editor);
+        })
+        .catch( error => {
+            console.error( error );
+        } );
+</script>
+
+Html:
+=====
+<style>
+    .ck-editor__editable {
+        min-height: 200px;
+    }
+</style>
+
+<textarea name="short_description" id="short_description"></textarea>
+
+
+
+Route:
+=====
+
+Route::post('/ckeditor-upload', [CkeditorController::class, 'upload'])->name('admin.ckeditor.upload');
+
+
+Controller:
+===========
+
+    public function upload(Request $request)
+    {
+        if($request->hasfile('upload'))       
+        {
+
+             
+            if($request->file('upload'))
+            {
+                $file_name=uploadImage($request->file('upload'),'storage/ckeditor');
+                $url=asset($file_name);
+                return response()->json([
+                    'fileName'=>$file_name,
+                    'uploaded'=>1,
+                    'url'=>$url
+                ]);
+            }
+            else
+            {
+                return response()->json([
+                    'fileName'=>'',
+                    'uploaded'=>0,
+                    'url'=>''
+                ]);
+            }
+             
+        }
+    }
+
+
+Helper Function:
+================
+function uploadImage($file,$folder)
+{
+
+         $extension=$file->extension();
+         if(array_search($extension,['example','jpg','png','jprg','gif']))
+         {
+              $filename=uniqid().'.'.$extension;
+              $uploaded=$file->move($folder,$filename);  
+              $filepath=$folder.'/'.$filename;
+              if($uploaded)
+              {
+                return $filepath;
+              }
+              else
+              {
+                return false;
+              }
+              
+         }
+         else
+         {
+              return false;
+         }
+
+}

@@ -1,3 +1,9 @@
+Reference:
+==========
+https://laravelpackages.net/sslwireless/sslwireless-sms
+
+
+
 1.install:
 ==========
 composer require sslwireless/sslwireless-sms
@@ -41,3 +47,8 @@ The output will always be in JSON format.
   "ssl_reference_no": "returned_sslwirless_reference_no", // api generated reference no
   "datetime": "2018-02-07 01:35AM" // datetime of process
 }
+
+Other source:
+=============
+https://github.com/nahid/php-sslwireless-sms
+
