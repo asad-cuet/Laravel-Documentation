@@ -1,0 +1,137 @@
+                            
+Store:
+=====
+$image_key='image';
+$image_path='storage/Tests';
+if($request->hasfile($image_key))       
+{
+    $file=$request->file($image_key);
+    if(isImage($file))
+    {
+        $path=$image_path;
+        $image_file_name=uploadFile($file,$path);
+        if($image_file_name)
+        {
+            $row[$image_key]=$image_file_name;
+        }
+        else
+        {
+            return back()->with('warning','Image Uploading Failed');
+        }
+    }
+    else
+    {
+        return back()->with('warning','Uploaded image extension is not allowed');
+    }
+}
+
+
+Update:
+=======
+
+$image_key='image';
+$image_path='storage/Tests';
+if($request->hasfile($image_key))       
+{
+    $file=$request->file($image_key);
+    if(isImage($file))
+    {
+        $path=$image_path;
+        $image_file_name=uploadFile($file,$path);
+        if($image_file_name)
+        {
+            $old_image=Test::where('id',$id)->first()[$image_key];
+            deleteFile($old_image);  
+            $row[$image_key]=$image_file_name;
+        }
+        else
+        {
+            return back()->with('warning','File Uploading Failed');
+        }
+    }
+    else
+    {
+        return back()->with('warning','Uploaded file extension is not allowed');
+    }
+}
+
+
+Delete:
+========
+
+$row=Test::where('id',$id)->first();
+        if($row['image']!='')
+        {
+            deleteFile($row['image']);
+        }
+        if($row['pdf']!='')
+        {
+            deleteFile($row['pdf']);
+        }
+$row->delete();
+
+
+
+Function:
+=========
+function isImage($file)
+{
+    $extention=$file->getClientOriginalExtension();  
+    if(in_array($extention,['jpg','png','jpeg','gif']))
+    {
+        return $extention;
+    }
+    else
+    {
+        return False;
+    }
+}
+
+function isPdf($file)
+{
+    $extention=$file->getClientOriginalExtension();  
+    if(in_array($extention,['pdf']))
+    {
+        return True;
+    }
+    else
+    {
+        return False;
+    }
+}
+
+function isAllowedFile($file)
+{
+    $extention=$file->getClientOriginalExtension();  
+    if(in_array($extention,['pdf','xlsx','csv','file']))
+    {
+        return $extention;
+    }
+    else
+    {
+        return False;
+    }
+}
+
+function uploadFile($file,$path)
+{
+    $extention=$file->getClientOriginalExtension();  
+    $filename=uniqid().'.'.$extention;
+    if($file->move($path,$filename))
+    {
+        $filename=$path.'/'.$filename;
+        return $filename;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function deleteFile($filename)
+{
+    if(File::exists($filename))
+    {
+        File::delete($filename);
+    }
+}
