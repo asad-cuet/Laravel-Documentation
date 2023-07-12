@@ -98,8 +98,8 @@ function googleApiCoordinateDistance($org_lat,$org_lng,$dest_lat,$dest_lng)
     ];
 }
 
-Uses:
-=====
+Uses/Controller Code:
+======================
 $org_lat=$request->origin_lat;
 $org_lng=$request->origin_lng;
 $dest_lat=$request->destination_lat;

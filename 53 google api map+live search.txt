@@ -1,0 +1,323 @@
+***Blade page Code****
+
+
+Common:
+========
+<input type="text" id="search-input" placeholder="Search for a place">
+{{-- this the map --}}
+<div id="map" style="height:400px; width: 800px;" class="col-md-12 my-2"></div>
+
+
+At Update Page:
+===============
+{
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+        <script>
+            /**
+            * @license
+            * Copyright 2019 Google LLC. All Rights Reserved.
+            * SPDX-License-Identifier: Apache-2.0
+            */
+            let map;
+            let marker;
+            let geocoder;
+            let responseDiv;
+            let response;
+            var savedLat={{$restaurant->latitude}};     //initial lat from db
+            var savedLng={{$restaurant->longitude}};    //initial lng from db
+
+
+    
+            function initMap() {
+                map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 16,
+                    center: { lat: savedLat, lng: savedLng },
+                });
+
+                const savedLocation = { lat: savedLat, lng: savedLng};
+                marker = new google.maps.Marker({
+                    map,
+                });
+                marker.setPosition(savedLocation);
+                geocoder = new google.maps.Geocoder();
+        
+                const inputText = document.createElement("input");
+        
+                inputText.type = "text";
+                inputText.placeholder = "Enter a location";
+        
+                const submitButton = document.createElement("input");
+        
+                submitButton.type = "button";
+                submitButton.value = "Search";
+                submitButton.classList.add("button", "button-primary");
+        
+                const clearButton = document.createElement("input");
+        
+                clearButton.type = "button";
+                clearButton.value = "Clear";
+                clearButton.classList.add("button", "button-secondary");
+                response = document.createElement("pre");
+                response.id = "response";
+                response.innerText = "";
+                responseDiv = document.createElement("div");
+                responseDiv.id = "response-container";
+                responseDiv.appendChild(response);
+        
+                const instructionsElement = document.createElement("p");
+        
+                instructionsElement.id = "instructions";
+
+                map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputText);
+                map.controls[google.maps.ControlPosition.TOP_LEFT].push(submitButton);
+                map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearButton);
+                map.controls[google.maps.ControlPosition.LEFT_TOP].push(
+                    instructionsElement
+                );
+                map.controls[google.maps.ControlPosition.LEFT_TOP].push(responseDiv);
+                marker = new google.maps.Marker({
+                    map,
+                });
+
+
+                map.addListener("click", (e) => {
+                    geocode({ location: e.latLng });
+                });
+                submitButton.addEventListener("click", () =>
+                    geocode({ address: inputText.value })
+                );
+                clearButton.addEventListener("click", () => {
+                    clear();
+                });
+                clear();
+                }
+        
+                function clear() {
+                    marker.setMap(null);
+                }
+
+                function clearMarker() {
+                    marker.setMap(null);
+                    marker=[];
+                    marker = new google.maps.Marker({
+                        map,
+                    });
+                }
+        
+                function geocode(request) {
+                    clear();
+                    geocoder
+                    .geocode(request)
+                    .then((result) => {
+                        const { results } = result;
+                    
+                        $('#latitude').val(results[0].geometry.location.lat())
+                        $('#longitude').val(results[0].geometry.location.lng())
+
+                        // clearMarker();
+                        map.setCenter(results[0].geometry.location);
+                        marker.setPosition(results[0].geometry.location);
+                        marker.setMap(map);
+
+                        
+                        //   response.innerText = JSON.stringify(result, null, 2);
+                        return results;
+                    })
+                    .catch((e) => {
+                    alert("Geocode was not successful for the following reason: " + e);
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get the search input element
+                $("#search-input").keyup(function(){
+                    var input = document.getElementById('search-input');
+                    console.log(input.value);
+
+                    // Create a new Autocomplete instance and set the input element as its target
+                    var autocomplete = new google.maps.places.Autocomplete(input);
+
+                    // Set options for the Autocomplete
+                    autocomplete.setFields(['formatted_address', 'geometry']);
+
+                    // Listen for place change events
+                    autocomplete.addListener('place_changed', function() {
+                        // Get the selected place
+                        var place = autocomplete.getPlace();
+
+                    // Access place details
+                    console.log('Formatted Address:', place.formatted_address);
+                    console.log('Latitude:', place.geometry.location.lat());
+                    console.log('Longitude:', place.geometry.location.lng());
+
+                    clear();
+                    map.setCenter(place.geometry.location);
+                    marker.setPosition(place.geometry.location);
+                    marker.setMap(map);
+                    $('#latitude').val(place.geometry.location.lat())
+                    $('#longitude').val(place.geometry.location.lng())
+                    // geocode({ address: place.formatted_address });
+
+                    });
+                });
+
+            });
+
+
+            window.initMap = initMap;
+    </script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=initMap&v=weekly&libraries=places"
+        defer>
+    </script> 
+}
+
+At create Page:
+================
+{
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script>
+            /**
+            * @license
+            * Copyright 2019 Google LLC. All Rights Reserved.
+            * SPDX-License-Identifier: Apache-2.0
+            */
+            let map;
+            let marker;
+            let geocoder;
+            let responseDiv;
+            let response;
+    
+            function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 16,
+                center: { lat: {{defaultLocation()['lat']}}, lng: {{defaultLocation()['lng']}} },
+            });
+            const initialLocation = { lat: {{defaultLocation()['lat']}}, lng: {{defaultLocation()['lng']}} };
+                marker = new google.maps.Marker({
+                    map,
+                });
+                marker.setPosition(initialLocation);
+            geocoder = new google.maps.Geocoder();
+    
+            //Geocode/Search [not live]
+                //   const inputText = document.createElement("input");
+                //   inputText.type = "text";
+                //   inputText.placeholder = "Enter a location";
+                //   const submitButton = document.createElement("input");
+                //   submitButton.type = "button";
+                //   submitButton.value = "Search";
+                //   submitButton.classList.add("button", "button-primary");
+    
+            const clearButton = document.createElement("input");
+
+            clearButton.type = "button";
+            clearButton.value = "Clear";
+            clearButton.classList.add("button", "button-secondary");
+            response = document.createElement("pre");
+            response.id = "response";
+            response.innerText = "";
+            responseDiv = document.createElement("div");
+            responseDiv.id = "response-container";
+            responseDiv.appendChild(response);
+    
+            const instructionsElement = document.createElement("p");
+    
+            instructionsElement.id = "instructions";
+
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputText);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(submitButton);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearButton);
+            map.controls[google.maps.ControlPosition.LEFT_TOP].push(
+                instructionsElement
+            );
+            map.controls[google.maps.ControlPosition.LEFT_TOP].push(responseDiv);
+            marker = new google.maps.Marker({
+                map,
+            });
+            map.addListener("click", (e) => {
+                geocode({ location: e.latLng });
+            });
+            submitButton.addEventListener("click", () =>
+                geocode({ address: inputText.value })
+            );
+            clearButton.addEventListener("click", () => {
+                clear();
+            });
+            clear();
+            }
+    
+            function clear() {
+            marker.setMap(null);
+            }
+    
+            function geocode(request) {
+            clear();
+            geocoder
+                .geocode(request)
+                .then((result) => {
+                    const { results } = result;
+                
+                    locationString=JSON.stringify(results[0].geometry.location);
+                    locationObj=JSON.parse(locationString);
+                    console.log(locationObj.lat);
+                    console.log(locationObj.lng);
+                    $('#latitude').val(locationObj.lat)
+                    $('#longitude').val(locationObj.lng)
+        
+                    map.setCenter(results[0].geometry.location);
+                    marker.setPosition(results[0].geometry.location);
+                    marker.setMap(map);
+                    //   response.innerText = JSON.stringify(result, null, 2);
+                    return results;
+                })
+                .catch((e) => {
+                alert("Geocode was not successful for the following reason: " + e);
+                });
+            }
+
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get the search input element
+                $("#search-input").keyup(function(){
+                    var input = document.getElementById('search-input');
+                    console.log(input.value);
+
+                    // Create a new Autocomplete instance and set the input element as its target
+                    var autocomplete = new google.maps.places.Autocomplete(input);
+
+                    // Set options for the Autocomplete
+                    autocomplete.setFields(['formatted_address', 'geometry']);
+
+                    // Listen for place change events
+                    autocomplete.addListener('place_changed', function() {
+                        // Get the selected place
+                        var place = autocomplete.getPlace();
+
+                    // Access place details
+                    console.log('Formatted Address:', place.formatted_address);
+                    console.log('Latitude:', place.geometry.location.lat());
+                    console.log('Longitude:', place.geometry.location.lng());
+
+                    clear();
+                    map.setCenter(place.geometry.location);
+                    marker.setPosition(place.geometry.location);
+                    marker.setMap(map);
+                    $('#latitude').val(place.geometry.location.lat())
+                    $('#longitude').val(place.geometry.location.lng())
+                    // geocode({ address: place.formatted_address });
+
+                    });
+                });
+
+            });
+    
+            window.initMap = initMap;
+    </script>
+    <script
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=initMap&v=weekly&libraries=places"
+    defer>
+    </script>
+}
+
+
