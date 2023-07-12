@@ -68,9 +68,9 @@ At Update Page:
         
                 instructionsElement.id = "instructions";
 
-                map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputText);
-                map.controls[google.maps.ControlPosition.TOP_LEFT].push(submitButton);
-                map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearButton);
+                // map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputText);
+                // map.controls[google.maps.ControlPosition.TOP_LEFT].push(submitButton);
+                // map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearButton);
                 map.controls[google.maps.ControlPosition.LEFT_TOP].push(
                     instructionsElement
                 );
@@ -225,9 +225,9 @@ At create Page:
     
             instructionsElement.id = "instructions";
 
-            map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputText);
-            map.controls[google.maps.ControlPosition.TOP_LEFT].push(submitButton);
-            map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearButton);
+            // map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputText);
+            // map.controls[google.maps.ControlPosition.TOP_LEFT].push(submitButton);
+            // map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearButton);
             map.controls[google.maps.ControlPosition.LEFT_TOP].push(
                 instructionsElement
             );
