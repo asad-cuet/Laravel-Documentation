@@ -1,0 +1,136 @@
+Time function:
+==============
+function currentBdDate()
+    {
+        return date(time() - 6*3600);
+    }
+function currentBdTime()
+    {
+        return (time() - 6*3600);
+    }
+
+function tomorrowTime($givenTime)
+{
+    $timestampForGivenDate = $givenTime;
+    $englishText = '+1 day';
+    return strtotime ( $englishText , $timestampForGivenDate );
+}
+
+function yesterdayTime($givenTime)
+{
+    $timestampForGivenDate = $givenTime;
+    $englishText = '-1 day';
+    return strtotime ( $englishText , $timestampForGivenDate );
+}
+
+function sqlDateFormat($time)
+{
+    return date('Y-m-d',$time);
+}
+
+
+
+
+
+
+Trending Tags:
+==============
+function get_hashtags($string, $str = 1) {
+    preg_match_all('/#(\w+)/',$string,$matches);
+    $i = 0;
+    $keywords='';
+    if ($str) {
+        foreach ($matches[1] as $match) {
+            $count = count($matches[1]);
+            $keywords .= "$match";
+            $i++;
+            if ($count > $i) $keywords .= ", ";
+        }
+    } else {
+        foreach ($matches[1] as $match) {
+            $keyword[] = $match;
+        }
+        $keywords = $keyword;
+    }
+    return $keywords;
+}
+
+function popularTags($tag_array) {
+    $p = array();
+    foreach($tag_array as $tags) {
+        $tags_arr = array_map('trim', explode(',', $tags));
+        foreach($tags_arr as $tag) {
+            $p[$tag] = array_key_exists($tag, $p) ? $p[$tag]+1 : 1;
+        }
+    }
+    arsort($p);
+    return $p;
+}
+
+//final function
+function getTrendingTags($datas,$column)   //$datas is rows data of db 
+{
+    $tags=[];
+
+    foreach($datas as $data)
+    {
+        $tags[]=str_replace(' ','',get_hashtags($data[$column]));
+    }
+
+    $tags_text= implode(',',$tags);
+
+    $all_tags_array= explode(',',$tags_text);
+    
+    $popular_tags_ascociative_arr=popularTags($all_tags_array); // keys is tags
+
+    $popular_tags_array=array_keys($popular_tags_ascociative_arr);
+
+    return $popular_tags_array;
+
+}
+
+
+Others:
+=======
+function filterNullFromArray($array)
+{
+    $except_keys=[];
+    foreach($array as $key=>$value)
+    {
+        if($value==null)
+        {
+            $except_keys[]=$key;
+        }
+
+        if(is_array($value))
+        if($value[0]==null)
+        {
+            $except_keys[]=$key;
+        }
+    }
+    return $except_keys;
+}
+
+function setEnv($name, $value)
+{
+    $path = base_path('.env');
+
+    $old = env($name);
+
+    if (file_exists($path)) {
+        file_put_contents($path, str_replace(
+            "$name=".$old, "$name=".$value, file_get_contents($path)
+        ));
+    }
+}
+
+function ModelData($model_name)
+{
+    return app($model_name)->where('is_active', 1)->orderby('order', 'ASC')->get();
+}
+
+
+function ArrayToColumns($model, $ids, $column_index)
+{
+    return $model_values =  app($model)->select('id', $column_index)->whereIn('id', $ids)->get();
+}
