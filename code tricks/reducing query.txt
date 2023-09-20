@@ -1,0 +1,69 @@
+Case:
+======
+   $orders = $this->model->newQuery();
+
+    if (!is_null($release_date_start) && !is_null($release_date_end)) {
+        $orders->whereBetween('releaseDate', [$release_date_start, $release_date_end]);
+    } else {
+        if (!is_null($release_date_start)) {
+            $orders->where('releaseDate', '>=', $release_date_start);
+        } else {
+            if (!is_null($release_date_end)) {
+                $orders->where('releaseDate', '<=', $release_date_end);
+            }
+        }
+    }
+
+    if (!is_null($claimId)) {
+        $orders->where(compact('claimId'));
+    }
+
+    if (!is_null($firm_id)) {
+        $orders->orWhere(compact('firm_id'));
+    }
+
+    if (!is_null($status)) {
+        $orders->where(compact('status'));
+    }
+
+    return $orders->orderBy($orderBy, $sortBy)->get();
+
+
+Soltution:
+----------
+
+$orders->when(!is_null($release_date_start) && !is_null($release_date_end), 
+        function($q) 
+        {
+            $q->whereBetween('releaseDate', [$release_date_start, $release_date_end]);
+        }, 
+        function($q) 
+        {
+            $q->when(!is_null($release_date_start), 
+            function($q) 
+            {
+                $q->where('releaseDate', '>=', $release_date_start);
+            },
+            function($q) 
+            {
+                $q->when(!is_null($release_date_end), 
+                function($q) {
+                    $q->where('releaseDate', '<=', $release_date_end);
+                })
+            })
+        })
+        ->when(!is_null($claimId), 
+        function($q) 
+        {
+            $q->where(compact('claimId'));
+        })
+        ->when(!is_null($firm_id), 
+        function($q) 
+        {
+            $q->orWhere(compact('firm_id'));
+        })
+        ->when(!is_null($status), 
+        function($q) 
+        {
+            $q->where(compact('status'));
+        });

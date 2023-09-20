@@ -1,3 +1,4 @@
+use Config;
 $paypal_setting=PaypalSetting::where('id',1)->first();
 
         //over writing config/paypal.php

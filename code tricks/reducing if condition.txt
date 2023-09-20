@@ -1,0 +1,21 @@
+Case:
+=====
+if ($user->country) {
+    $country = $user->country->name;
+}
+
+Soltion:
+--------
+$country = optional($user->country)->name;
+
+
+Case:
+=====
+$country = optional(optional($user)->country)->name;
+
+Soltion:
+--------
+$country = $user?->country?->name;
+
+
+

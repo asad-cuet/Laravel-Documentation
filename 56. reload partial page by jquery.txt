@@ -1,0 +1,1 @@
+$('.cart-button').load(location.href+" .cart-button");
