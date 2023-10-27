@@ -1,0 +1,41 @@
+$order_details = OrderDetail::join('orders', 'order_details.order_id', 'orders.id')
+                ->join('users', 'orders.user_id', 'users.id')
+                ->join('products', 'order_details.product_id', 'products.id')
+
+                ->when($date_range!=null,
+                function($query) use($date_range)
+                {
+                    $date_range = explode(" to ", $date_range);
+
+                    $start_date=date('Y-m-d 00:00:00',strtotime($date_range[0]));
+                    $end_date=date('Y-m-d 23:59:59',strtotime($date_range[1]));
+        
+                    $query=$query->whereBetween('orders.created_at', [$start_date, $end_date]);
+                })
+
+                ->select(
+                    DB::raw('orders.id as order_id'),
+
+                    DB::raw('COUNT(*) as no_of_products'),
+
+                    DB::raw('GROUP_CONCAT(order_details.product_id) as products_ids'),
+
+                    DB::raw('sum(order_details.quantity) as products_total_quantity'),
+
+
+                    DB::raw('JSON_EXTRACT(shipping_address, "$.address") as shipping_address'),
+
+                    DB::raw('sum(order_details.price) as subtotal'),
+
+                    DB::raw('
+                        CASE
+                            WHEN orders.delivery_status = 1 THEN "Cancelled"
+                            WHEN orders.delivery_status = 2 THEN "Returned"
+                            ELSE "Unknown"
+                        END as delivery_status
+                    ')
+                )
+
+                ->orderBy('orders.id', 'desc')
+                ->groupBy('order_details.order_id')
+                ->get();

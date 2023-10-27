@@ -1,0 +1,73 @@
+ref: https:ocs.laravel-excel.com/3.1/getting-start
+
+
+Controller:
+===========
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\OrderExport;
+
+
+    function method()
+    {
+        $datas=Model::get();
+        $filePath='Orders.csv';
+        $excel_data=new OrderExport($datas);
+        return Excel::download($excel_data, $filePath);
+    }
+
+
+App/Export/ExportFile.php:
+==========================
+
+<?php
+namespace App\Exports;
+
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithMapping;
+
+class OrderExport implements FromCollection, WithHeadings, WithMapping
+{                                             //if need    //if need
+    /**
+    * @var Invoice $invoice
+    */
+
+    protected $data;
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    public function collection()
+    {
+        return $this->data;
+    }
+
+
+    //if need to custom heeding
+    public function headings():array{
+        return[
+            'Heading',
+            'Heading',
+            'Heading',
+            '.......',
+            '.......'
+        ];
+    }
+
+
+    // if need to mapping data
+    public function map($item): array
+    {
+        return [
+            $item->data,
+            $item->data,
+            $item->data,
+            $item->data,
+            $item->data,
+            $item->data,
+            ............
+            ............
+        ];
+    }
+}
