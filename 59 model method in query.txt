@@ -1,0 +1,5 @@
+$products = Product::orderBy('id', 'desc')->get();
+
+        $products = $products->filter(function ($product) {
+            return $product->stocksCountNew2() > 0;   //model method
+        });
