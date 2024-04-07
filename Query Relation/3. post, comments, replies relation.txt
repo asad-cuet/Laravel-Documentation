@@ -1,0 +1,69 @@
+If you have a `parent_id` column in the `comments` table to represent the relationship between a comment and its parent comment (reply), 
+you can establish a hierarchical structure for comments, allowing for nested replies. Here's how you can set up the relationships:
+
+1. **One-to-Many Relationship between Posts and Comments:**
+   - Each post can have multiple comments.
+   - Define this relationship in the `Post` model.
+   - Each comment belongs to a single post.
+   - Define this relationship in the `Comment` model.
+
+2. **Self-Referencing One-to-Many Relationship for Comments:**
+   - Each comment can have multiple replies (child comments).
+   - Define a self-referencing one-to-many relationship in the `Comment` model, using the `parent_id` column to reference the ID of the parent comment.
+   - Each reply belongs to a single parent comment.
+
+Here's how you can set up these relationships in Laravel:
+
+**Post Model:**
+```php
+class Post extends Model
+{
+    public function comments()
+    {
+        return $this->hasMany('App\Models\Comment');
+    }
+}
+```
+
+**Comment Model:**
+```php
+class Comment extends Model
+{
+    public function post()
+    {
+        return $this->belongsTo('App\Models\Post');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany('App\Models\Comment', 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\Comment', 'parent_id');
+    }
+}
+```
+
+With this setup, you can access comments and their replies as follows:
+
+- To retrieve all comments for a post:
+  ```php
+  $post = App\Models\Post::find($postId);
+  $comments = $post->comments;
+  ```
+
+- To retrieve all replies for a comment:
+  ```php
+  $comment = App\Models\Comment::find($commentId);
+  $replies = $comment->replies;
+  ```
+
+- To retrieve the parent comment for a reply:
+  ```php
+  $reply = App\Models\Comment::find($replyId);
+  $parentComment = $reply->parent;
+  ```
+
+This setup allows for a hierarchical structure of comments where each comment can have multiple replies, creating a tree-like structure for discussions on posts.

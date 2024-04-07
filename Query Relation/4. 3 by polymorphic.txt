@@ -1,0 +1,97 @@
+We can set up a polymorphic relationship between posts, comments, and replies. This will allow comments and their replies to be associated with posts through a single relationship. Here's how you can set it up:
+
+1. **Posts Table:**
+   - `id`: Primary key for posts.
+   - Other post-related columns like `title`, `content`, etc.
+
+2. **Comments Table:**
+   - `id`: Primary key for comments.
+   - `content`: Content of the comment.
+   - `commentable_id`: Foreign key referencing the `id` column in the related model (e.g., `posts` table).
+   - `commentable_type`: String column storing the class name of the related model (`App\Models\Post`), indicating the type of the related model.
+
+3. **Replies Table (Comments Table Structure):**
+   - `id`: Primary key for replies.
+   - `content`: Content of the reply.
+   - `commentable_id`: Foreign key referencing the `id` column in the related model (e.g., `comments` table).
+   - `commentable_type`: String column storing the class name of the related model (`App\Models\Comment`), indicating the type of the related model.
+
+**Laravel Eloquent Setup:**
+
+1. **Post Model:**
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    public function comments()
+    {
+        return $this->morphMany('App\Models\Comment', 'commentable');
+    }
+}
+```
+
+2. **Comment Model:**
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    public function commentable()
+    {
+        return $this->morphTo();
+    }
+
+    public function replies()
+    {
+        return $this->morphMany('App\Models\Comment', 'commentable');
+    }
+
+    public function nestedReplies()
+    {
+        return $this->hasMany('App\Models\Comment', 'parent_id');
+    }
+}
+```
+
+3. **Reply (Nested Comment) Model (Same as Comment Model):**
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    public function commentable()
+    {
+        return $this->morphTo();
+    }
+
+    public function replies()
+    {
+        return $this->morphMany('App\Models\Comment', 'commentable');
+    }
+}
+```
+
+With this setup:
+
+- Each post can have multiple comments, and each comment can have multiple replies (nested comments).
+- The `commentable_id` and `commentable_type` columns in the `comments` and `replies` tables will indicate which post or comment they belong to, forming the polymorphic relationship.
+
+You can now access comments and replies for a post as follows:
+
+```php
+$post = App\Models\Post::find($postId);
+$comments = $post->comments;
+
+foreach ($comments as $comment) {
+    $replies = $comment->replies;
+    // Process replies for each comment
+
+    foreach ($replies as $reply) {
+       $nestedReplies = $reply->nestedReplies;
+       // Process nested replies for each reply
+    }
+}
+```
+
+This setup allows for a flexible association between posts, comments, and their replies through a polymorphic relationship, providing versatility and maintainability in your Laravel application.

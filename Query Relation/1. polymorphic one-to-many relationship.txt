@@ -1,0 +1,72 @@
+**Polymorphic One-to-Many Relationship: Posts and Contents Shares**
+
+**Description:**
+- In this relationship, one post can have multiple associated content shares, and each content share can belong to one post.
+- The relationship is polymorphic, meaning the `contents_shares` table can associate with various types of content, not just posts.
+
+**Tables and Columns:**
+1. **Posts Table:**
+   - `id`: Primary key for posts.
+   - `title`: Title of the post.
+   - `content`: Content of the post.
+   - `user_id`: Foreign key referencing the `id` column in the `users` table.
+
+2. **Contents Shares Table:**
+   - `id`: Primary key for content shares.
+   - `content`: Content of the shared content.
+   - `contentable_id`: Foreign key referencing the `id` column in the related model (e.g., `posts` table).
+   - `contentable_type`: String column storing the class name of the related model (`App\Models\Post`), indicating the type of the related model.
+
+**Laravel Eloquent Setup:**
+- Define a polymorphic one-to-many relationship using the `morphMany` method in the `Post` model to associate with content shares.
+- Use the `morphTo` method in the `ContentsShare` model to indicate the parent model it can belong to.
+
+**Example SQL Schema (posts table):**
+```sql
+CREATE TABLE posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+**Example SQL Schema (contents_shares table):**
+```sql
+CREATE TABLE contents_shares (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT,
+    contentable_id INT,
+    contentable_type VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+**Laravel Eloquent Relationships:**
+- In the `Post` model:
+  ```php
+  class Post extends Model
+  {
+      public function contentShares()
+      {
+          return $this->morphMany('App\Models\ContentsShare', 'contentable');
+      }
+  }
+  ```
+- In the `ContentsShare` model:
+  ```php
+  class ContentsShare extends Model
+  {
+      public function contentable()
+      {
+          return $this->morphTo();
+      }
+  }
+  ```
+
+This setup allows for a flexible association between posts and various content shares through a polymorphic one-to-many relationship, 
+providing versatility and maintainability in your Laravel application.
