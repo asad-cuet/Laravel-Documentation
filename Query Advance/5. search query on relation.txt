@@ -1,0 +1,16 @@
+
+On BelongsTo relation method:
+==============================
+
+    if($request->administrative_department_short_name!='')
+    {
+        $data=$data->whereHas('administrativeDepartment', function ($query) use ($request) {
+            $query->where('short_name', $request->administrative_department_short_name);
+        });
+    }
+
+
+    public function scopeWithJobTypes($query)
+    {
+        return $query->leftJoin('job_types', 'jobs.job_type_id', '=', 'job_types.id');
+    }

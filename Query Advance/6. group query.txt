@@ -1,0 +1,3 @@
+->where(function ($query) {
+                $query->whereNull('');
+            })

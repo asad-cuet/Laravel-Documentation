@@ -1,0 +1,9 @@
+'bones' => $this->when(
+$request->get('include') == 'bones',
+BoneResource::collection($this->bones)
+),
+
+'rating' => $this->when(Auth::user()-
+>canSeeRatings(), 12),
+
+

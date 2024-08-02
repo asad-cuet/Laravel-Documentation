@@ -1,0 +1,12 @@
+whereExists()
+Allows you to select only rows that, when passed into a provided subquery,
+return at least one row. Imagine you only want to get those users who have
+left at least one comment:
+$commenters = DB::table('users')
+->whereExists(function ($query) {
+$query->select('id')
+->from('comments')
+->whereRaw('comments.user_id =
+users.id');
+})
+->get();
